@@ -10,49 +10,75 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 `;
-const Header = styled.section`
+const HeaderSection = styled.section`
     width: 100%;
-    height: 15vh;
+    height: 12vh;
+`;
+const SmallWrapper = styled.div`
+    width: 75%;
+    height: 100%;
+    margin: 0 auto;
+`;
+const Header = styled.div`
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-start;
 `;
-const HeaderLeft = styled.div`
-    width: 20vw;
-    height: 100%;
-`;
-const HeaderMiddle = styled.div`
-    width: 60vw;
+const HeaderLogoContainer = styled.div`
+    width: 15vw;
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    padding: 0.5rem;
-    gap: 1rem;
-    background-color: #eee;
+    justify-content: center;
 `;
-const HeaderRight = styled.div`
-    width: 20vw;
+const HeaderEmpty = styled.div`
+    width: 70vw;
     height: 100%;
 `;
-const Body = styled.section`
-    width: 100%;
-    height: 80vh;
-    background-color: #d9d9d9;
+const HeaderToggleContainer = styled.div`
+    width: 15vw;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+const BarImageWrapper = styled.div`
+    width: 6rem;
+    height: 6rem;
+    border-radius: 50%;
+    box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0 , 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+const BarImage = styled.img`
+    width: 50%;
+    height: 50%;
 `;
 
 export default function HomePage() {
     return (
         <Wrapper>
-            <Header>
-                <HeaderLeft></HeaderLeft>
-                <HeaderMiddle>
-                    <Logo></Logo>
-                    1
-                </HeaderMiddle>
-                <HeaderRight></HeaderRight>
-            </Header>
-            <Body></Body>
+            <HeaderSection>
+                <SmallWrapper>
+                    <Header>
+                        <HeaderLogoContainer>
+                            <Logo></Logo>
+                        </HeaderLogoContainer>
+                        <HeaderEmpty></HeaderEmpty>
+                        <HeaderToggleContainer>
+                            <BarImageWrapper>
+                                <BarImage src="/image/bars.svg"></BarImage>
+                            </BarImageWrapper>
+                        </HeaderToggleContainer>
+                    </Header>
+                </SmallWrapper>
+            </HeaderSection>
         </Wrapper>
     )
 }
