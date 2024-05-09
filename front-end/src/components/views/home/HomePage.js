@@ -1,6 +1,8 @@
 import styled from "styled-components"
 import Logo from "../../commons/logo/Logo";
 import { COLORS } from "../../../commons/styles/COLORS";
+import BarModal from "../../commons/modal/BarModal";
+import { useCallback, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -41,15 +43,20 @@ const HeaderEmpty = styled.div`
 const HeaderToggleContainer = styled.div`
     width: 15vw;
     height: 100%;
+`;
+const BarImageContainer = styled.div`
+    width: 100%;
+    height: 100%;
     display: flex;
     align-items: center;
     justify-content: flex-end;
+    position: relative;
 `;
 const BarImageWrapper = styled.div`
     width: 5.5rem;
     height: 5.5rem;
     border-radius: 50%;
-    box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0 , 0.2);
+    box-shadow: 0 0.5rem 0.5rem 0 rgba(0, 0, 0 , 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -92,7 +99,7 @@ const NavText = styled.h1`
 `;
 const NoticeSection = styled.section`
     width: 100%;
-    height: 6vh;
+    height: 5vh;
 `;
 const NoticeContainer = styled.div`
     width: 100%;
@@ -110,7 +117,7 @@ const NoticeText = styled.p`
 `;
 const BodySection = styled.section`
     width: 100%;
-    height: 66vh;
+    height: 67vh;
 `;
 const BodyContainer = styled.div`
     width: 100%;
@@ -196,6 +203,16 @@ const FooterText = styled.p`
 
 export default function HomePage(props) {
     const imsiNoticeTextList = ['공지사항1', '공지사항2', '공지사항3'];
+    const [isOnBarModal, setIsOnBarModal] = useState(false);
+    // modal open/close
+    const handleBarModal = (e) => {
+        e.stopPropagation();
+        setIsOnBarModal(!isOnBarModal);
+    };
+    // modal close
+    const handleModalClose = useCallback(() => {
+        setIsOnBarModal(false);
+    }, []);
 
     return (
         <Wrapper>
@@ -207,9 +224,15 @@ export default function HomePage(props) {
                         </HeaderLogoContainer>
                         <HeaderEmpty></HeaderEmpty>
                         <HeaderToggleContainer>
-                            <BarImageWrapper>
-                                <BarImage src="/image/bars.svg"></BarImage>
-                            </BarImageWrapper>
+                            <BarImageContainer>
+                                <BarImageWrapper onClick={handleBarModal}>
+                                    <BarImage src="/image/bars.svg"></BarImage>
+                                </BarImageWrapper>
+                                <BarModal
+                                    isOn={isOnBarModal}
+                                    handleModalClose={handleModalClose}
+                                ></BarModal>
+                            </BarImageContainer>
                         </HeaderToggleContainer>
                     </HeaderContainer>
                 </SmallWrapper>
