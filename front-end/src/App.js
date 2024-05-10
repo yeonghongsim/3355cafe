@@ -3,6 +3,7 @@ import './App.css';
 import styled from 'styled-components';
 import { Route, Routes } from 'react-router-dom';
 import HomePage from './components/views/home/HomePage';
+import SignUpPage from './components/views/signup/SignUpPage';
 import Test1 from './components/views/test/Test1';
 
 const Wrapper = styled.div`
@@ -15,6 +16,7 @@ function App() {
     <Wrapper>
       <Routes>
         <Route path='/' element={< HomePage />}></Route>
+        <Route path='/signUp' element={< SignUpPage />}></Route>
         <Route path='/test1' element={< Test1 />}></Route>
       </Routes>
     </Wrapper>

@@ -1,6 +1,5 @@
 import styled from "styled-components"
 import Logo from "../../commons/logo/Logo";
-import { COLORS } from "../../../commons/styles/COLORS";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useState } from "react";
 
@@ -71,7 +70,7 @@ const BarImage = styled.img`
 const NavbarSection = styled.section`
     width: 100%;
     height: 8vh;
-    background-color: ${COLORS.primeColor};
+    background: linear-gradient(#68D2E8, #03AED2);
 `;
 const NavbarContainer = styled.div`
     width: 100%;
@@ -117,7 +116,7 @@ const NoticeText = styled.p`
 `;
 const BodySection = styled.section`
     width: 100%;
-    height: 67vh;
+    height: 68vh;
 `;
 const BodyContainer = styled.div`
     width: 100%;
@@ -131,6 +130,7 @@ const BodyContainerLeft = styled.div`
     height: 100%;
     background-color: lightgreen;
     padding: 1rem;
+    box-sizing: border-box;
 `;
 const BodyContainerRight = styled.div`
     width: 40%;
@@ -145,11 +145,12 @@ const BodyContainerRightSmall = styled.div`
     height: 50%;
     background-color: ${props => props.bgColor};
     padding: 1rem;
+    box-sizing: border-box;
 `;
 const FooterSection = styled.section`
     width: 100%;
-    height: 8vh;
-    background-color: darkgray;
+    height: 7vh;
+    background: linear-gradient(#eee, #d9d9d9);
 `;
 const FooterContainer = styled.div`
     width: 100%;
@@ -191,6 +192,9 @@ const FooterText = styled.p`
         color: blue;
         cursor: pointer;
         text-decoration: underline;
+    }
+    &:hover::after {
+        color: black;
     }
     ${props => props.afterText && `
     &::after {

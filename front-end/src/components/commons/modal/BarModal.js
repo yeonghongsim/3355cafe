@@ -1,5 +1,7 @@
 import { useEffect, useRef } from "react";
 import styled from "styled-components"
+import LoginBtn from "../button/LoginBtn";
+import SignupBtn from "../button/SignupBtn";
 
 const Wrapper = styled.div`
     width: 25rem;
@@ -14,7 +16,7 @@ const Wrapper = styled.div`
     opacity: ${(props) => (props.isOn ? 1 : 0)};
     transition: all .9s ease-out;
     z-index: 200;
-    padding: 1rem;
+    padding: 0.5rem;
     box-sizing: border-box;
 `;
 const ModalContainer = styled.div`
@@ -25,20 +27,92 @@ const ModalContainer = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 `;
-const Tester1 = styled.div`
+const ProfileContainer = styled.div`
     width: 100%;
-    height: 5rem;
-    background-color: #eee;
+    height: 6rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
 `;
-const Tester2 = styled.div`
+const ProfileImageContainer = styled.div`
+    width: 6rem;
+    height: 100%;
+    padding: 0.3rem;
+    box-sizing: border-box;
+`;
+const ProfileImageWrapper = styled.div`
     width: 100%;
-    height: 8rem;
+    height: 100%;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #d9d9d9;
 `;
-const Tester3 = styled.div`
+const ProfileImage = styled.img`
+    width: 60%;
+    height: 60%;
+    flex-shrink: 1;
+`;
+const ProfileNameContainer = styled.div`
+    width: calc(100% - 6rem);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding-left: 1rem;
+    box-sizing: border-box;
+    gap: 0.5rem;
+`;
+const ProfileName = styled.p`
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+`;
+const ProfileText = styled.span`
+    font-size: 1.4rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    padding-left: 0.5rem;
+`;
+const ContentContainer = styled.div`
     width: 100%;
-    height: 4rem;
-    background-color: #eee;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    box-sizing: border-box;
+`;
+const ContentText = styled.p`
+    font-size: 1.6rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    &:hover {
+        color: blue;
+        cursor: pointer;
+        text-decoration: underline;
+    }
+    &:hover::after {
+        color: black;
+    }
+    ${props => props.afterText && `
+    &::after {
+        content: "|";
+        padding: 0 0.5rem 0 0.5rem;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+    `}
+`;
+const ButtonContainer = styled.div`
+    width: 100%;
+    height: 5rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
 `;
 
 export default function BarModal({ props, isOn, handleModalClose }) {
@@ -66,10 +140,28 @@ export default function BarModal({ props, isOn, handleModalClose }) {
     return (
         <Wrapper isOn={isOn} ref={modalRef}>
             <ModalContainer>
-                <Tester1>프로필 영역 / 프로필 사진,아이디, 게시글(n개)</Tester1>
-                <Tester2>유저 사용정보 / 정보관리, 게시글관리</Tester2>
-                <Tester3>로그인버튼</Tester3>
-                <Tester3>가입버튼</Tester3>
+                <ProfileContainer>
+                    <ProfileImageContainer>
+                        <ProfileImageWrapper>
+                            <ProfileImage src="/image/profile.svg"></ProfileImage>
+                        </ProfileImageWrapper>
+                    </ProfileImageContainer>
+                    <ProfileNameContainer>
+                        <ProfileName>Guest
+                            <ProfileText>님</ProfileText>
+                        </ProfileName>
+                    </ProfileNameContainer>
+                </ProfileContainer>
+                <ContentContainer>
+                    <ContentText afterText={true}>회원 정보</ContentText>
+                    <ContentText afterText={false}>게시글(n)</ContentText>
+                </ContentContainer>
+                <ButtonContainer>
+                    <LoginBtn></LoginBtn>
+                </ButtonContainer>
+                <ButtonContainer>
+                    <SignupBtn></SignupBtn>
+                </ButtonContainer>
             </ModalContainer>
         </Wrapper>
     )
