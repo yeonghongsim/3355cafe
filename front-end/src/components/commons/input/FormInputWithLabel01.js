@@ -20,6 +20,7 @@ const InputWrapper = styled.div`
     height: 3.5rem;
     background-color: white;
     border: 0.1rem solid #eee;
+    // border: ${(props) => (props.isonerr === 'true' ? '0.1rem solid red' : '0.1rem solid #eee')};
     border-radius: 0.5rem;
     box-sizing: border-box;
     display: flex;
@@ -50,16 +51,20 @@ export default function FormInputWithLabel01({
     , type
     , id
     , name
+    , forwardRef
+    , placeholder
 }) {
     return (
         <Wrapper>
-            <Label for={id}>{label}</Label>
+            <Label htmlFor={id}>{label}</Label>
             <InputWrapper>
                 <Input
                     type={type}
                     id={id}
                     name={name}
-                    autocomplete="off"
+                    autoComplete="off"
+                    ref={forwardRef}
+                    placeholder={placeholder}
                 ></Input>
             </InputWrapper>
         </Wrapper>

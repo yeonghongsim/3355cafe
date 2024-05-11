@@ -143,7 +143,7 @@ const BodyContainerRight = styled.div`
 const BodyContainerRightSmall = styled.div`
     width: 100%;
     height: 50%;
-    background-color: ${props => props.bgColor};
+    background-color: ${props => props.bgcolor};
     padding: 1rem;
     box-sizing: border-box;
 `;
@@ -196,7 +196,7 @@ const FooterText = styled.p`
     &:hover::after {
         color: black;
     }
-    ${props => props.afterText && `
+    ${props => props.aftertext && `
     &::after {
         padding-left: 1rem;
         content: "|";
@@ -233,7 +233,7 @@ export default function HomePage(props) {
                                     <BarImage src="/image/bars.svg"></BarImage>
                                 </BarImageWrapper>
                                 <BarModal
-                                    isOn={isOnBarModal}
+                                    ison={isOnBarModal ? "true" : "false"}
                                     handleModalClose={handleModalClose}
                                 ></BarModal>
                             </BarImageContainer>
@@ -261,8 +261,8 @@ export default function HomePage(props) {
                 <SmallWrapper>
                     <NoticeContainer>
                         {
-                            imsiNoticeTextList.map((text) =>
-                                <NoticeText>
+                            imsiNoticeTextList.map((text, i) =>
+                                <NoticeText key={i}>
                                     {text}
                                 </NoticeText>
                             )
@@ -278,10 +278,10 @@ export default function HomePage(props) {
                             이미지 슬라이드
                         </BodyContainerLeft>
                         <BodyContainerRight>
-                            <BodyContainerRightSmall bgColor="lightblue">
+                            <BodyContainerRightSmall bgcolor="lightblue">
                                 오늘의 핫이슈
                             </BodyContainerRightSmall>
-                            <BodyContainerRightSmall bgColor="lightyellow">
+                            <BodyContainerRightSmall bgcolor="lightyellow">
                                 이미지 파일들(ppt, video) 다운로드
                             </BodyContainerRightSmall>
                         </BodyContainerRight>
@@ -296,8 +296,8 @@ export default function HomePage(props) {
                             <CopyrightText>Copyright</CopyrightText>
                         </FooterCopyrightContainer>
                         <FooterTextContainer>
-                            <FooterText afterText={true}>ppt</FooterText>
-                            <FooterText afterText={false}>video</FooterText>
+                            <FooterText aftertext="true">ppt</FooterText>
+                            <FooterText aftertext="false">video</FooterText>
                         </FooterTextContainer>
                     </FooterContainer>
                 </SmallWrapper>
