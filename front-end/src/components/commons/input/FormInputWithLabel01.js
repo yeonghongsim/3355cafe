@@ -52,6 +52,7 @@ export default function FormInputWithLabel01({
     , forwardRef
     , placeholder
     , isOnErr
+    , readOnly
 }) {
 
     return (
@@ -65,6 +66,7 @@ export default function FormInputWithLabel01({
                     autoComplete="off"
                     ref={forwardRef}
                     placeholder={placeholder}
+                    readOnly={readOnly}
                 ></Input>
             </InputWrapper>
         </Wrapper>
