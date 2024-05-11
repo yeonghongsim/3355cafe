@@ -11,7 +11,7 @@ const Wrapper = styled.div`
 `;
 const Label = styled.label`
     font-size: 1.5rem;
-    font-weight: normal;
+    font-weight: bold;
     color: black;
     margin: 0;
 `;
@@ -19,8 +19,7 @@ const InputWrapper = styled.div`
     width: 100%;
     height: 3.5rem;
     background-color: white;
-    border: 0.1rem solid #eee;
-    // border: ${(props) => (props.isonerr === 'true' ? '0.1rem solid red' : '0.1rem solid #eee')};
+    border: 0.1rem solid ${(props) => (props.$isOnErr ? "red" : "#d9d9d9")};
     border-radius: 0.5rem;
     box-sizing: border-box;
     display: flex;
@@ -46,18 +45,19 @@ const Input = styled.input`
 `;
 
 export default function FormInputWithLabel01({
-    props
-    , label
+    label
     , type
     , id
     , name
     , forwardRef
     , placeholder
+    , isOnErr
 }) {
+
     return (
         <Wrapper>
             <Label htmlFor={id}>{label}</Label>
-            <InputWrapper>
+            <InputWrapper $isOnErr={isOnErr}>
                 <Input
                     type={type}
                     id={id}

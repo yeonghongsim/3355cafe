@@ -2,7 +2,7 @@ import styled from "styled-components";
 import Logo from "../../commons/logo/Logo";
 import { COLORS } from "../../../commons/styles/COLORS";
 import FormInputWithLabel01 from "../../commons/input/FormInputWithLabel01";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -34,7 +34,6 @@ const Form = styled.form`
 const Layer = styled.div`
     width: 100%;
     height: 5.9rem;
-    background-color: #eee;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
@@ -42,13 +41,12 @@ const Layer = styled.div`
 const Inputs = styled.div`
     width: ${(props) => (`${props.width}%`)};
     height: 100%;
-    background-color: #d9d9d9;
     position: relative;
 `;
 const IdCheckBtn = styled.div`
     width: 100%;
     height: 3.5rem;
-    background-color: black;
+    background-color: #41B06E;
     bottom: 0;
     position: absolute;
     border-radius: 0.5rem;
@@ -105,15 +103,31 @@ export default function SignUpPage() {
     const emailAddressRef = useRef(null);
     const emailSiteRef = useRef(null);
     // 모든 인풋에 대한 err state
+    let [isOnErrUserId, setIsOnErrUserId] = useState(false);
+    let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
+    let [isOnErrPwCheck, setIsOnErrPwCheck] = useState(false);
+    let [isOnErrUserName, setIsOnErrUserName] = useState(false);
+    let [isOnErrGender, setIsOnErrGender] = useState(false);
+    let [isOnErrBirth, setIsOnErrBirth] = useState(false);
+    let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
+    let [isOnErrEmailAddress, setIsOnErrEmailAddress] = useState(false);
+    let [isOnErrEmailSite, setIsOnErrEmailSite] = useState(false);
 
     // 1-(1~2) 아이디 유효성 검사 및 중복 확인
     const userIdValnMul = async () => {
         console.log('validation n mutiple test start');
         const userId = userIdRef.current.value;
-        console.log(`userId : ` + userId);
         // 간이 유효성 검사
         // 숫자,영문 각 최소 하나 이상 포함한 6-15자리
+        const isValid = /^(?!.*[!@#$%^&*(),.?":{}|<>])(?=.*[a-zA-Z])(?=.*\d).{6,15}$/.test(userId);
         // 오류 발생시 바로 리턴
+        if (!isValid) {
+            console.log('error');
+            setIsOnErrUserId(true);
+            return;
+        } else {
+            setIsOnErrUserId(false);
+        }
         // 1-2
         await fetchUserIdMultiple(userId);
         console.log('validation n mutiple test finish');
@@ -182,6 +196,14 @@ export default function SignUpPage() {
         // 오류 발생 시
         if (data.userId === '') {
             console.log('error');
+            setIsOnErrUserPw(true);
+            setIsOnErrPwCheck(true);
+            setIsOnErrUserName(true);
+            setIsOnErrGender(true);
+            setIsOnErrBirth(true);
+            setIsOnErrPhoneNumber(true);
+            setIsOnErrEmailAddress(true);
+            setIsOnErrEmailSite(true);
             return;
         }
         // 검사 통과
@@ -202,7 +224,7 @@ export default function SignUpPage() {
                 <Form>
                     <Text>* 필수</Text>
                     <Layer>
-                        <Inputs width="75">
+                        <Inputs width="78">
                             <FormInputWithLabel01
                                 label="아이디"
                                 type="text"
@@ -210,9 +232,10 @@ export default function SignUpPage() {
                                 name="userId"
                                 forwardRef={userIdRef}
                                 placeholder="숫자,영문 혼합 6-15자리"
+                                isOnErr={isOnErrUserId}
                             ></FormInputWithLabel01>
                         </Inputs>
-                        <Inputs width="5"></Inputs>
+                        <Inputs width="2"></Inputs>
                         <Inputs width="20">
                             <IdCheckBtn onClick={userIdValnMul}>
                                 <IdCheckText>확 인</IdCheckText>
@@ -228,6 +251,7 @@ export default function SignUpPage() {
                                 name="userPw"
                                 forwardRef={userPwRef}
                                 placeholder="숫자,영문,특수기호 혼합 10-20자리"
+                                isOnErr={isOnErrUserPw}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
@@ -240,6 +264,7 @@ export default function SignUpPage() {
                                 name="userPwCheck"
                                 forwardRef={pwCheckRef}
                                 placeholder="입력한 비밀번호와 동일"
+                                isOnErr={isOnErrPwCheck}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
@@ -252,6 +277,7 @@ export default function SignUpPage() {
                                 name="userName"
                                 forwardRef={userNameRef}
                                 placeholder="한글만"
+                                isOnErr={isOnErrUserName}
                             ></FormInputWithLabel01>
                         </Inputs>
                         <Inputs width="15"></Inputs>
@@ -263,6 +289,7 @@ export default function SignUpPage() {
                                 name="gender"
                                 forwardRef={genderRef}
                                 placeholder="라디오 할거임"
+                                isOnErr={isOnErrGender}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
@@ -275,6 +302,7 @@ export default function SignUpPage() {
                                 name="birth"
                                 forwardRef={birthRef}
                                 placeholder="reactDatePicker 사용"
+                                isOnErr={isOnErrBirth}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
@@ -288,11 +316,12 @@ export default function SignUpPage() {
                                 name="phoneNumber"
                                 forwardRef={phoneNumberRef}
                                 placeholder="010 및 '-' 제외 숫자 8자리"
+                                isOnErr={isOnErrPhoneNumber}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
                     <Layer>
-                        <Inputs width="65">
+                        <Inputs width="55">
                             <FormInputWithLabel01
                                 label="이메일 주소"
                                 type="text"
@@ -300,10 +329,11 @@ export default function SignUpPage() {
                                 name="emailAddress"
                                 forwardRef={emailAddressRef}
                                 placeholder="수신 가능한 이메일 주소"
+                                isOnErr={isOnErrEmailAddress}
                             ></FormInputWithLabel01>
                         </Inputs>
                         <Inputs width="2"></Inputs>
-                        <Inputs width="33">
+                        <Inputs width="43">
                             <FormInputWithLabel01
                                 label="사이트"
                                 type="text"
@@ -311,6 +341,7 @@ export default function SignUpPage() {
                                 name="emailSite"
                                 forwardRef={emailSiteRef}
                                 placeholder="셀렉트 할거임"
+                                isOnErr={isOnErrEmailSite}
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>

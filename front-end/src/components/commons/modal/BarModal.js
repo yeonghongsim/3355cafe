@@ -5,7 +5,7 @@ import SignupBtn from "../button/SignupBtn";
 
 const Wrapper = styled.div`
     width: 25rem;
-    max-height: ${(props) => (props.ison === 'true' ? "100rem" : 0)};
+    max-height: ${(props) => (props.$isOn === 'true' ? "100rem" : 0)};
     background-color: white;
     border-radius: 0.5rem;
     position: absolute;
@@ -13,7 +13,7 @@ const Wrapper = styled.div`
     top: 90%;
     right: 0;
     overflow: hidden;
-    opacity: ${(props) => (props.ison === 'true' ? 1 : 0)};
+    opacity: ${(props) => (props.$isOn === 'true' ? 1 : 0)};
     transition: all 1.2s ease-in-out;
     z-index: 200;
     padding: 0.5rem;
@@ -99,7 +99,7 @@ const ContentText = styled.p`
     &:hover::after {
         color: black;
     }
-    ${props => props.aftertext && `
+    ${props => props.$afterText && `
     &::after {
         content: "|";
         padding: 0 0.5rem 0 0.5rem;
@@ -117,14 +117,14 @@ const ButtonContainer = styled.div`
 
 export default function BarModal({
     props
-    , ison
+    , isOn
     , handleModalClose
 }) {
     const modalRef = useRef(null);
 
     useEffect(() => {
         let handleClickOutside;
-        if (ison) {
+        if (isOn) {
             handleClickOutside = (e) => {
                 if (modalRef.current && !modalRef.current.contains(e.target)) {
                     handleModalClose();
@@ -136,13 +136,13 @@ export default function BarModal({
             window.removeEventListener("click", handleClickOutside);
         }
     }, [
-        ison
+        isOn
         , handleModalClose
         , modalRef
     ]);
 
     return (
-        <Wrapper ison={ison} ref={modalRef}>
+        <Wrapper $isOn={isOn} ref={modalRef}>
             <ModalContainer>
                 <ProfileContainer>
                     <ProfileImageContainer>
@@ -157,8 +157,8 @@ export default function BarModal({
                     </ProfileNameContainer>
                 </ProfileContainer>
                 <ContentContainer>
-                    <ContentText aftertext="true">회원 정보</ContentText>
-                    <ContentText aftertext="false">게시글(n)</ContentText>
+                    <ContentText $afterText="true">회원 정보</ContentText>
+                    <ContentText $afterText="false">게시글(n)</ContentText>
                 </ContentContainer>
                 <ButtonContainer>
                     <LoginBtn></LoginBtn>
