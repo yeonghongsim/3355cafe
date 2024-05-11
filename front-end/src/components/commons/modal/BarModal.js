@@ -14,7 +14,7 @@ const Wrapper = styled.div`
     right: 0;
     overflow: hidden;
     opacity: ${(props) => (props.isOn ? 1 : 0)};
-    transition: all .9s ease-out;
+    transition: all 1.2s ease-in-out;
     z-index: 200;
     padding: 0.5rem;
     box-sizing: border-box;
