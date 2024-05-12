@@ -2,6 +2,8 @@ import styled from "styled-components";
 import Logo from "../../commons/logo/Logo";
 import { COLORS } from "../../../commons/styles/COLORS";
 import FormInputWithLabel01 from "../../commons/input/FormInputWithLabel01";
+import FormRadioWithLabel01 from "../../commons/input/FormRadioWithLabel01";
+import FormSelectWrapper01 from "../../commons/select/FormSelectWrapper01";
 import { useRef, useState } from "react";
 
 const Wrapper = styled.div`
@@ -115,8 +117,7 @@ export default function SignUpPage() {
     let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
     let [isOnErrPwCheck, setIsOnErrPwCheck] = useState(false);
     let [isOnErrUserName, setIsOnErrUserName] = useState(false);
-    let [isOnErrGender, setIsOnErrGender] = useState(false);
-    let [isOnErrBirth, setIsOnErrBirth] = useState(false);
+    // let [isOnErrBirth, setIsOnErrBirth] = useState(false);
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
     let [isOnErrEmailAddress, setIsOnErrEmailAddress] = useState(false);
     let [isOnErrEmailSite, setIsOnErrEmailSite] = useState(false);
@@ -270,8 +271,7 @@ export default function SignUpPage() {
         if (isErrorOn) {
             console.log('userDataValidation error');
             setIsOnErrUserDataValidation(true);
-            setIsOnErrGender(true);
-            setIsOnErrBirth(true);
+            // setIsOnErrBirth(true);
             setIsOnErrEmailSite(true);
             return;
         } else {
@@ -359,31 +359,56 @@ export default function SignUpPage() {
                                 readOnly={false}
                             ></FormInputWithLabel01>
                         </Inputs>
-                        <Inputs width="15"></Inputs>
-                        <Inputs width="35">
-                            <FormInputWithLabel01
+                        <Inputs width="20"></Inputs>
+                        <Inputs width="30">
+                            <FormRadioWithLabel01
                                 label="성별"
-                                type="text"
+                                type="radio"
                                 id="gender"
                                 name="gender"
                                 forwardRef={genderRef}
-                                placeholder="라디오 할거임"
-                                isOnErr={isOnErrGender}
-                            ></FormInputWithLabel01>
+                                options={[
+                                    { index: 1, value: "남자", label: "남자" },
+                                    { index: 2, value: "여자", label: "여자" },
+                                ]}
+                            ></FormRadioWithLabel01>
                         </Inputs>
                     </Layer>
                     <Layer>
-                        <Inputs width="30">
-                            <FormInputWithLabel01
-                                label="생년월일"
+                        <Inputs width="20">
+                            <FormSelectWrapper01
+                                label="생일) 년도"
                                 type="text"
-                                id="birth"
-                                name="birth"
-                                forwardRef={birthRef}
-                                placeholder="reactDatePicker 사용"
-                                isOnErr={isOnErrBirth}
+                                id="year"
+                                name="year"
+                                forwardRef={emailSiteRef}
+                                placeholder="ex) 2000"
                                 readOnly={true}
-                            ></FormInputWithLabel01>
+                            ></FormSelectWrapper01>
+                        </Inputs>
+                        <Inputs width="1.5"></Inputs>
+                        <Inputs width="15">
+                            <FormSelectWrapper01
+                                label="월"
+                                type="text"
+                                id="month"
+                                name="month"
+                                forwardRef={emailSiteRef}
+                                placeholder="01"
+                                readOnly={true}
+                            ></FormSelectWrapper01>
+                        </Inputs>
+                        <Inputs width="1.5"></Inputs>
+                        <Inputs width="15">
+                            <FormSelectWrapper01
+                                label="일"
+                                type="text"
+                                id="day"
+                                name="day"
+                                forwardRef={emailSiteRef}
+                                placeholder="29"
+                                readOnly={true}
+                            ></FormSelectWrapper01>
                         </Inputs>
                     </Layer>
                     <Text>* 한가지 이상 필수</Text>
