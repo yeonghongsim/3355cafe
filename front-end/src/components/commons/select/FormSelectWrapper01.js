@@ -35,7 +35,6 @@ export default function FormSelectWrapper01({
     , name
     , forwardRef
     , isOnErr
-    // , setInputValue
 }) {
 
     return (
@@ -43,12 +42,11 @@ export default function FormSelectWrapper01({
             <Label htmlFor={id}>{label}</Label>
             <SelectWrapper>
                 <FormSelect01
-                    forwardRef={forwardRef}
-                    isOnErr={isOnErr}
                     id={id}
                     name={name}
                     type={type}
-                // setInputValue={setInputValue}
+                    forwardRef={forwardRef}
+                    isOnErr={isOnErr}
                 ></FormSelect01>
             </SelectWrapper>
         </Wrapper>

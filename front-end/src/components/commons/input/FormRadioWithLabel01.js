@@ -28,6 +28,9 @@ const InputWrapper = styled.div`
     border-radius: 1rem;
     box-shadow: 0 0.4rem 1.2rem 0 rgba(0, 0, 0, 0.2);
 `;
+const HideInput = styled.input`
+    display: none;
+`
 
 export default function FormRadioWithLabel01({
     label
@@ -38,6 +41,7 @@ export default function FormRadioWithLabel01({
 }) {
     return (
         <Wrapper>
+            <HideInput ref={forwardRef} defaultValue={options[0].value}></HideInput>
             <Label>{label}</Label>
             <InputWrapper>
                 {
@@ -47,6 +51,7 @@ export default function FormRadioWithLabel01({
                             option={option}
                             type={type}
                             id={id}
+                            forwardRef={forwardRef}
                         ></FormRadioInput01>
                     )
                 }

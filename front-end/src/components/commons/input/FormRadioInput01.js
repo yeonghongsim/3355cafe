@@ -35,7 +35,11 @@ export default function FormRadioInput01({
     option
     , type
     , id
+    , forwardRef
 }) {
+    const handleGenderValue = (value) => {
+        forwardRef.current.value = value;
+    };
 
     return (
         <InputWrapper>
@@ -44,6 +48,8 @@ export default function FormRadioInput01({
                 id={option.value}
                 name={id}
                 defaultChecked={option.index === 1}
+                value={option.value}
+                onChange={() => handleGenderValue(option.value)}
             ></Input>
             <Label htmlFor={option.value}>{option.label}</Label>
         </InputWrapper>

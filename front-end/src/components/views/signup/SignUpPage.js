@@ -4,7 +4,7 @@ import { COLORS } from "../../../commons/styles/COLORS";
 import FormInputWithLabel01 from "../../commons/input/FormInputWithLabel01";
 import FormRadioWithLabel01 from "../../commons/input/FormRadioWithLabel01";
 import FormSelectWrapper01 from "../../commons/select/FormSelectWrapper01";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -100,6 +100,14 @@ const SubmitText = styled.p`
     font-weight: bold;
     color: white;
 `;
+const ImsiBtn = styled.div`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid black;
+    width: 10rem;
+    height: 3.3rem;
+`;
 
 export default function SignUpPage() {
     // 모든 인풋의 ref
@@ -112,8 +120,8 @@ export default function SignUpPage() {
     const birthMonthRef = useRef(null);;
     const birthDayRef = useRef(null);
     const phoneNumberRef = useRef(null);
-    const emailAddressRef = useRef(null);
-    const emailSiteRef = useRef(null);
+    // const emailAddressRef = useRef(null);
+    // const emailSiteRef = useRef(null);
     // 모든 인풋에 대한 err state
     let [isOnErrUserId, setIsOnErrUserId] = useState(false);
     let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
@@ -123,22 +131,12 @@ export default function SignUpPage() {
     let [isOnErrBirthMonth, setIsOnErrBirthMonth] = useState(false);
     let [isOnErrBirthDay, setIsOnErrBirthDay] = useState(false);
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
-    let [isOnErrEmailAddress, setIsOnErrEmailAddress] = useState(false);
-    let [isOnErrEmailSite, setIsOnErrEmailSite] = useState(false);
+    // let [isOnErrEmailAddress, setIsOnErrEmailAddress] = useState(false);
+    // let [isOnErrEmailSite, setIsOnErrEmailSite] = useState(false);
     // 아이디 중복확인 여부
     let [confirmedUserId, setConfirmedUserId] = useState(false);
     // 데이터 유효성 검사 실패 여부
     let [isOnErrUserDataValidation, setIsOnErrUserDataValidation] = useState(false);
-    // birth input value set
-    // const setBirthYearValue = (option) => {
-    //     birthYearRef.current.value = option;
-    // };
-    // const setBirthMonthValue = (option) => {
-    //     birthMonthRef.current.value = option;
-    // };
-    // const setBirthDayValue = (option) => {
-    //     birthDayRef.current.value = option;
-    // };
 
     // 1-(1~2) 아이디 유효성 검사 및 중복 확인
     // 1-1
@@ -201,8 +199,8 @@ export default function SignUpPage() {
             birthDayRef.current.value + '/' +
             birthYearRef.current.value;
         const phoneNumber = phoneNumberRef.current.value;
-        const email = emailAddressRef.current.value + '@' +
-            emailSiteRef.current.value;
+        // const email = emailAddressRef.current.value + '@' +
+        //     emailSiteRef.current.value;
         // 데이터 취합
         const data = {
             userId: userId,
@@ -214,18 +212,22 @@ export default function SignUpPage() {
             phoneNumber: phoneNumber,
             // emailAddress: emailAddressRef,
             // emailSite: emailSiteRef,
-            email: email,
+            // email: email,
             role: 'USER',
             profileImg: null,
         }
-        // 2-2
+        console.log(data);
+        // 2-2 사용자 등록 전 유효성 검사
         userDataValidation(data);
         if (isOnErrUserDataValidation) {
             console.log('데이터 부적합');
             return;
         }
-        // 2-3
-        await fetchRegisterUserData(data);
+        // // 연락처 010 추가
+        const prepareData = { ...data };
+        prepareData.phoneNumber = '010' + prepareData.phoneNumber;
+        // 2-3 사용자 정보 db에 등록
+        await fetchRegisterUserData(prepareData);
         // 2-4 등록 후 로그인 페이지로 이동.
         console.log('page move');
     };
@@ -259,14 +261,33 @@ export default function SignUpPage() {
         } else {
             setIsOnErrUserName(false);
         }
-        // 성별 인풋
-        // 조건 : 라디오로 진행
         // 생년월일 인풋
-        // 조건 : 리엑트 데이트 픽커 사용
+        // 조건 : 각 인풋 null값 인 경우 오류
+        // 년
+        const yearValid = data.birth.split('/')[2] === '' ? true : false;
+        if (yearValid) {
+            setIsOnErrBirthYear(true)
+        } else {
+            setIsOnErrBirthYear(false)
+        }
+        // 월
+        const monthValid = data.birth.split('/')[0] === '' ? true : false;
+        if (monthValid) {
+            setIsOnErrBirthMonth(true)
+        } else {
+            setIsOnErrBirthMonth(false)
+        }
+        // 일
+        const dayValid = data.birth.split('/')[1] === '' ? true : false;
+        if (dayValid) {
+            setIsOnErrBirthDay(true)
+        } else {
+            setIsOnErrBirthDay(false)
+        }
         // 핸드폰 번호 인풋
         // 조건 : 숫자 8자리인지
         const phoneNumberValidBefore = /^[0-9]*$/.test(data.phoneNumber);
-        const phoneNumberValid = !phoneNumberValidBefore || (data.phoneNumber.length > 0 && data.phoneNumber.length !== 8);
+        const phoneNumberValid = !phoneNumberValidBefore || data.phoneNumber.length !== 8;
         if (phoneNumberValid) {
             setIsOnErrPhoneNumber(true);
         } else {
@@ -274,23 +295,22 @@ export default function SignUpPage() {
         }
         // 이메일 인풋
         // 조건 : 이메일주소에 영문,숫자만 있는지
-        const emailValid = /^(?!.*[!@#$%^&*(),.?":{}|<>])(?!.*[ㄱ-ㅎㅏ-ㅣ가-힣])(?=.*[a-zA-Z])(?=.*\d).{0,30}$/.test(data.email.split('@')[0]);
-        if (!emailValid) {
-            setIsOnErrEmailAddress(true);
-        } else {
-            setIsOnErrEmailAddress(false);
-        }
+        // const emailValid = /^(?!.*[!@#$%^&*(),.?":{}|<>])(?!.*[ㄱ-ㅎㅏ-ㅣ가-힣])(?=.*[a-zA-Z])(?=.*\d).{0,30}$/.test(data.email.split('@')[0]);
+        // if (!emailValid) {
+        //     setIsOnErrEmailAddress(true);
+        // } else {
+        //     setIsOnErrEmailAddress(false);
+        // }
         const isErrorOn = !pwValid || pwCheckValid || !nameValid
-            || phoneNumberValid || emailValid;
-        console.log('isErrorOn : ' + isErrorOn);
+            || phoneNumberValid || yearValid || monthValid || dayValid;
+        // const isErrorOn = !pwValid || pwCheckValid || !nameValid
+        //     || phoneNumberValid || emailValid;
+        // console.log('isErrorOn : ' + isErrorOn);
         // 오류 발생 시
         if (isErrorOn) {
             console.log('userDataValidation error');
             setIsOnErrUserDataValidation(true);
-            setIsOnErrBirthYear(true);
-            setIsOnErrBirthMonth(true);
-            setIsOnErrBirthDay(true);
-            setIsOnErrEmailSite(true);
+            // setIsOnErrEmailSite(true);
             return;
         } else {
             setIsOnErrUserDataValidation(false);
@@ -300,18 +320,51 @@ export default function SignUpPage() {
         console.log('validation end');
     };
     // 2-3 사용자 정보 db에 등록
-    const fetchRegisterUserData = async (data) => {
+    const fetchRegisterUserData = async (prepareData) => {
         console.log('fetch register userData start');
-        console.log(data);
+        console.log(prepareData);
         console.log('fetch register userData end');
     };
     // test area
-    useEffect(() => (
-        console.log('value : ' + birthYearRef.current.value)
-    ))
+    const handleBirthValue = () => {
+        const birth = birthMonthRef.current.value + '/' +
+            birthDayRef.current.value + '/' +
+            birthYearRef.current.value;
+        // 년
+        const yearValid = birth.split('/')[2] === '' ? true : false;
+        if (yearValid) {
+            console.log('null')
+            setIsOnErrBirthYear(true)
+        } else {
+            console.log('null X')
+            setIsOnErrBirthYear(false)
+        }
+        // 월
+        const monthValid = birth.split('/')[0] === '' ? true : false;
+        if (monthValid) {
+            console.log('null')
+            setIsOnErrBirthMonth(true)
+        } else {
+            console.log('null X')
+            setIsOnErrBirthMonth(false)
+        }
+        // 일
+        const dayValid = birth.split('/')[1] === '' ? true : false;
+        if (dayValid) {
+            console.log('null')
+            setIsOnErrBirthDay(true)
+        } else {
+            console.log('null X')
+            setIsOnErrBirthDay(false)
+        }
+        if (yearValid || monthValid || dayValid) {
+            console.log('error')
+        }
+    };
 
     return (
         <Wrapper>
+            <ImsiBtn onClick={handleBirthValue}>+</ImsiBtn>
             <MainContainer>
                 <Logo></Logo>
                 <Form>
@@ -405,7 +458,6 @@ export default function SignUpPage() {
                                 name="year"
                                 forwardRef={birthYearRef}
                                 isOnErr={isOnErrBirthYear}
-                            // setInputValue={setBirthYearValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                         <Inputs width="1.5"></Inputs>
@@ -417,7 +469,6 @@ export default function SignUpPage() {
                                 name="month"
                                 forwardRef={birthMonthRef}
                                 isOnErr={isOnErrBirthMonth}
-                            // setInputValue={setBirthMonthValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                         <Inputs width="1.5"></Inputs>
@@ -429,7 +480,6 @@ export default function SignUpPage() {
                                 name="day"
                                 forwardRef={birthDayRef}
                                 isOnErr={isOnErrBirthDay}
-                            // setInputValue={setBirthDayValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                     </Layer>
@@ -448,7 +498,7 @@ export default function SignUpPage() {
                             ></FormInputWithLabel01>
                         </Inputs>
                     </Layer>
-                    <Layer>
+                    {/* <Layer>
                         <Inputs width="55">
                             <FormInputWithLabel01
                                 label="이메일 주소"
@@ -474,7 +524,7 @@ export default function SignUpPage() {
                                 readOnly={false}
                             ></FormInputWithLabel01>
                         </Inputs>
-                    </Layer>
+                    </Layer> */}
                 </Form>
                 <SubmitBtn
                     onClick={registerBtnClick}

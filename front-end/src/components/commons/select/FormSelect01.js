@@ -88,7 +88,6 @@ export default function FormSelect01({
     , type
     , forwardRef
     , isOnErr
-    // , setInputValue
 }) {
     const selectRef = useRef(null);
     const [isOn, setIsOn] = useState(false);
@@ -110,8 +109,8 @@ export default function FormSelect01({
     }, [selectRef]);
     const optionClick = (option) => {
         // forwaredRef의 value를 option으로 변경하기.
-        forwardRef.current.value = option;
         setIsOn(false);
+        forwardRef.current.value = option;
     };
 
     return (
@@ -124,6 +123,7 @@ export default function FormSelect01({
                     ref={forwardRef}
                     placeholder="click."
                     readOnly
+                    defaultValue={null}
                 ></Input>
             </InputWrapper>
             <OptionWrapper $isOn={isOn}>
