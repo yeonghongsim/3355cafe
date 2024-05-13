@@ -4,7 +4,7 @@ import { COLORS } from "../../../commons/styles/COLORS";
 import FormInputWithLabel01 from "../../commons/input/FormInputWithLabel01";
 import FormRadioWithLabel01 from "../../commons/input/FormRadioWithLabel01";
 import FormSelectWrapper01 from "../../commons/select/FormSelectWrapper01";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -108,7 +108,9 @@ export default function SignUpPage() {
     const pwCheckRef = useRef(null);
     const userNameRef = useRef(null);
     const genderRef = useRef(null);
-    const birthRef = useRef(null);
+    const birthYearRef = useRef(null);
+    const birthMonthRef = useRef(null);;
+    const birthDayRef = useRef(null);
     const phoneNumberRef = useRef(null);
     const emailAddressRef = useRef(null);
     const emailSiteRef = useRef(null);
@@ -117,7 +119,9 @@ export default function SignUpPage() {
     let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
     let [isOnErrPwCheck, setIsOnErrPwCheck] = useState(false);
     let [isOnErrUserName, setIsOnErrUserName] = useState(false);
-    // let [isOnErrBirth, setIsOnErrBirth] = useState(false);
+    let [isOnErrBirthYear, setIsOnErrBirthYear] = useState(false);
+    let [isOnErrBirthMonth, setIsOnErrBirthMonth] = useState(false);
+    let [isOnErrBirthDay, setIsOnErrBirthDay] = useState(false);
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
     let [isOnErrEmailAddress, setIsOnErrEmailAddress] = useState(false);
     let [isOnErrEmailSite, setIsOnErrEmailSite] = useState(false);
@@ -125,6 +129,16 @@ export default function SignUpPage() {
     let [confirmedUserId, setConfirmedUserId] = useState(false);
     // 데이터 유효성 검사 실패 여부
     let [isOnErrUserDataValidation, setIsOnErrUserDataValidation] = useState(false);
+    // birth input value set
+    // const setBirthYearValue = (option) => {
+    //     birthYearRef.current.value = option;
+    // };
+    // const setBirthMonthValue = (option) => {
+    //     birthMonthRef.current.value = option;
+    // };
+    // const setBirthDayValue = (option) => {
+    //     birthDayRef.current.value = option;
+    // };
 
     // 1-(1~2) 아이디 유효성 검사 및 중복 확인
     // 1-1
@@ -183,7 +197,9 @@ export default function SignUpPage() {
         const pwCheck = pwCheckRef.current.value;
         const userName = userNameRef.current.value;
         const gender = genderRef.current.value;
-        const birth = birthRef.current.value;
+        const birth = birthMonthRef.current.value + '/' +
+            birthDayRef.current.value + '/' +
+            birthYearRef.current.value;
         const phoneNumber = phoneNumberRef.current.value;
         const email = emailAddressRef.current.value + '@' +
             emailSiteRef.current.value;
@@ -271,7 +287,9 @@ export default function SignUpPage() {
         if (isErrorOn) {
             console.log('userDataValidation error');
             setIsOnErrUserDataValidation(true);
-            // setIsOnErrBirth(true);
+            setIsOnErrBirthYear(true);
+            setIsOnErrBirthMonth(true);
+            setIsOnErrBirthDay(true);
             setIsOnErrEmailSite(true);
             return;
         } else {
@@ -287,6 +305,10 @@ export default function SignUpPage() {
         console.log(data);
         console.log('fetch register userData end');
     };
+    // test area
+    useEffect(() => (
+        console.log('value : ' + birthYearRef.current.value)
+    ))
 
     return (
         <Wrapper>
@@ -381,9 +403,9 @@ export default function SignUpPage() {
                                 type="text"
                                 id="year"
                                 name="year"
-                                forwardRef={emailSiteRef}
-                                placeholder="ex) 2000"
-                                readOnly={true}
+                                forwardRef={birthYearRef}
+                                isOnErr={isOnErrBirthYear}
+                            // setInputValue={setBirthYearValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                         <Inputs width="1.5"></Inputs>
@@ -393,9 +415,9 @@ export default function SignUpPage() {
                                 type="text"
                                 id="month"
                                 name="month"
-                                forwardRef={emailSiteRef}
-                                placeholder="01"
-                                readOnly={true}
+                                forwardRef={birthMonthRef}
+                                isOnErr={isOnErrBirthMonth}
+                            // setInputValue={setBirthMonthValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                         <Inputs width="1.5"></Inputs>
@@ -405,9 +427,9 @@ export default function SignUpPage() {
                                 type="text"
                                 id="day"
                                 name="day"
-                                forwardRef={emailSiteRef}
-                                placeholder="29"
-                                readOnly={true}
+                                forwardRef={birthDayRef}
+                                isOnErr={isOnErrBirthDay}
+                            // setInputValue={setBirthDayValue}
                             ></FormSelectWrapper01>
                         </Inputs>
                     </Layer>
