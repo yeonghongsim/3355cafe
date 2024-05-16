@@ -19,7 +19,7 @@ const Image = styled.img`
     object-fit: cover;
 `;
 
-export default function Logo(props) {
+export default function LOGO(props) {
     const moveToHomepage = () => {
         window.location.href = "/"
     };

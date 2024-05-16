@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import Logo from "../../commons/logo/Logo";
+import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useState } from "react";
 
@@ -224,7 +224,7 @@ export default function HomePage(props) {
                 <SmallWrapper>
                     <HeaderContainer>
                         <HeaderLogoContainer>
-                            <Logo></Logo>
+                            <LOGO></LOGO>
                         </HeaderLogoContainer>
                         <HeaderEmpty></HeaderEmpty>
                         <HeaderToggleContainer>

@@ -133,8 +133,6 @@ export default function SignUpConfirmModal({
         } catch (error) { console.log('통신 오류: ', error) }
     };
 
-    console.log(prepareData);
-
     return (
         <Wrapper $isOn={isOn}>
             <Container ref={modalRef}>

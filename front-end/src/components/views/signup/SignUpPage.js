@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import Logo from "../../commons/logo/Logo";
+import LOGO from "../../commons/logo/LOGO";
 import { COLORS } from "../../../commons/styles/COLORS";
 import FormInputWithLabel01 from "../../commons/input/FormInputWithLabel01";
 import FormRadioWithLabel01 from "../../commons/input/FormRadioWithLabel01";
@@ -94,17 +94,6 @@ const SubmitText = styled.p`
     font-weight: bold;
     color: white;
 `;
-const ImsiBtn = styled.div`
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid black;
-    width: 10rem;
-    height: 3.3rem;
-    position: fixed;
-    top: 2rem;
-    left: 2rem;
-`;
 
 export default function SignUpPage() {
     // 모든 인풋의 ref
@@ -141,7 +130,7 @@ export default function SignUpPage() {
         const isValid = /^(?!.*[!@#$%^&*(),.?":{}|<>])(?!.*[ㄱ-ㅎㅏ-ㅣ가-힣])(?=.*[a-zA-Z])(?=.*\d).{6,15}$/.test(userId);
         // 오류 발생시 코드 종료
         if (!isValid) {
-            console.log('검사 부적합');
+            // console.log('검사 부적합');
             setIsOnErrUserId(true);
             return;
         } else {
@@ -301,20 +290,15 @@ export default function SignUpPage() {
         }
         // console.log('validation end');
     };
-    // test area
-    const handleModalOpen = (e) => {
-        setIsOnConfirmModal(true);
-        e.stopPropagation();
-    };
+    // confirm modal close
     const handleModalClose = () => {
         setIsOnConfirmModal(false);
     };
 
     return (
         <Wrapper>
-            <ImsiBtn onClick={handleModalOpen}>+</ImsiBtn>
             <MainContainer>
-                <Logo></Logo>
+                <LOGO></LOGO>
                 <Form>
                     <Layer>
                         <Inputs width="78">

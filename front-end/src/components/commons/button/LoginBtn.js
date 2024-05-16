@@ -20,8 +20,12 @@ const Text = styled.p`
 `;
 
 export default function LoginBtn() {
+    const moveToPage = () => {
+        window.location.href = '/login';
+    };
+
     return (
-        <Wrapper>
+        <Wrapper onClick={moveToPage}>
             <Text>로그인</Text>
         </Wrapper>
     )
