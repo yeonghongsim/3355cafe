@@ -91,7 +91,6 @@ export default function FormSelect01({
 }) {
     const selectRef = useRef(null);
     const [isOn, setIsOn] = useState(false);
-    const options = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
 
     const handleOptionOpen = () => {
         setIsOn(!isOn);
@@ -112,6 +111,33 @@ export default function FormSelect01({
         setIsOn(false);
         forwardRef.current.value = option;
     };
+    let options = [];
+    // test area
+    if (id === 'day') {
+        // console.log('day')
+        let imsiOptions = [];
+        for (let i = 1; 31 >= i; i++) {
+            imsiOptions.push(i);
+        }
+        options = imsiOptions;
+    }
+    if (id === 'month') {
+        // console.log('month')
+        let imsiOptions = [];
+        for (let i = 1; 12 >= i; i++) {
+            imsiOptions.push(i);
+        }
+        options = imsiOptions;
+    }
+    if (id === 'year') {
+        // console.log('year')
+        const year = new Date().getFullYear();
+        let imsiOptions = [];
+        for (let i = year; i >= year - 130; i--) {
+            imsiOptions.push(i);
+        }
+        options = imsiOptions;
+    }
 
     return (
         <SelectWrapper $isOnErr={isOnErr} ref={selectRef}>

@@ -43,3 +43,34 @@ app.get('/checkId/:imsiId', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 })
+// 사용자 회원가입 코드
+app.post('/signUp', async function (req, res) {
+    try {
+        console.log('Received a signUp request from the front end.');
+        // 여기에서 실제로 데이터베이스에 데이터를 추가하는 등의 작업 수행 가능
+        db.collection('users').insertOne({
+            userId: req.body.userId,
+            userPassword: req.body.userPassword,
+            userName: req.body.userName,
+            birth: req.body.birth,
+            phoneNumber: req.body.phoneNumber,
+            profileImgURL: req.body.profileImgURL,
+            profileImgName: req.body.prifileImgName,
+            gender: req.body.gender,
+            role: req.body.role,
+            isVanned: req.body.isVanned,
+        }, function (error, result) {
+            if (error) {
+                console.error('Error inserting data into the database:', error);
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+            else {
+                console.log('Data inserted successfully.');
+                res.status(200).json({ message: 'Success' });
+            }
+        })
+    } catch (error) {
+        console.error('Error processing signUp request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
