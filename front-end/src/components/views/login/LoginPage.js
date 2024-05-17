@@ -3,6 +3,7 @@ import LOGO from "../../commons/logo/LOGO";
 import { COLORS } from "../../../commons/styles/COLORS";
 import LoginInputWithLabel01 from "../../commons/input/LoginInputWithLabel01";
 import { useRef, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -93,10 +94,10 @@ const ErrorAnnounceText = styled.p`
 `;
 
 export default function LoginPage() {
+    const navigate = useNavigate();
     const userIdRef = useRef(null);
     const userPwRef = useRef(null);
     let [errorLogin, setErrorLogin] = useState();
-
 
     const handleFindInfo = () => {
         console.log('try to find id/pw')
@@ -147,7 +148,7 @@ export default function LoginPage() {
                     // store에 저장
                     // store.dispatch(setUser(userInfo));
                     // 페이지 이동
-                    // navigate('/');
+                    navigate('/');
                 }
             })
             .catch(error => {

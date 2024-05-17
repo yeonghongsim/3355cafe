@@ -215,7 +215,7 @@ export default function SignUpPage() {
         // console.log('validation start');
         // 비밀번호 인풋
         // 조건 : 숫자,영문,특수기호 각 최소 하나이상 포함 10-20자리
-        const pwValid = /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[a-zA-Z])(?=.*\d).{10,20}$/.test(data.userPassword);
+        const pwValid = /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[a-zA-Z])(?=.*\d)(?=\S+$).{10,20}$/.test(data.userPassword);
         if (!pwValid) {
             // console.log('검사 부적합');
             setIsOnErrUserPw(true);
