@@ -117,13 +117,15 @@ export default function SignUpPage() {
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
     // 아이디 중복확인 여부
     let [confirmedUserId, setConfirmedUserId] = useState(false);
+    // 유효성 검사 후 오류 발생 여부
+    // let [isOnErrDataValidation, setIsOnErrDataValidation] = useState(false);
     // 등록 창 모달
     let [isOnConfirmModal, setIsOnConfirmModal] = useState(false);
     // 최종 데이터 세팅
     let [prepareData, setPrepareData] = useState({});
     // 1-(1~2) 아이디 유효성 검사 및 중복 확인
     // 1-1
-    const userIdValnMul = async () => {
+    const userIdValnMul = () => {
         const userId = userIdRef.current.value;
         // 간이 유효성 검사
         // 숫자,영문 각 최소 하나 이상 포함한 6-15자리
@@ -137,7 +139,7 @@ export default function SignUpPage() {
             setIsOnErrUserId(false);
         }
         // 1-2 오류 미발생 후 중복 확인 패칭
-        await fetchUserIdMultiple(userId);
+        fetchUserIdMultiple(userId);
     };
     // 1-2 오류 미발생 후 중복 확인 패칭
     const fetchUserIdMultiple = async (userId) => {
@@ -164,6 +166,8 @@ export default function SignUpPage() {
                 }
             })
     };
+    // user data validation error 여부 : 사용처 273줄
+    let dataValidationError;
     // 사용자 등록 2-(1~2)
     // 2-1
     const registerBtnClick = (e) => {
@@ -191,15 +195,22 @@ export default function SignUpPage() {
             profileImgURL: null,
             profileImgName: null,
             isVanned: false,
+            boardLikeList: [],
+            replyLikeList: [],
         }
         // console.log(data);
         // 2-2 사용자 등록 전 유효성 검사
         userDataValidation(data);
-        setIsOnConfirmModal(true);
-        e.stopPropagation();
+        // 오류 발생 확인 후 처리
+        if (!dataValidationError) {
+            // 오류 미발생 : confirm modal open
+            console.log('no error');
+            setIsOnConfirmModal(true);
+            e.stopPropagation();
+        }
     };
     // 2-2 사용자 등록 전 유효성 검사
-    const userDataValidation = async (data, events) => {
+    const userDataValidation = (data) => {
         // 데이터 유효성 검사 시작
         // console.log('validation start');
         // 비밀번호 인풋
@@ -261,15 +272,16 @@ export default function SignUpPage() {
         }
         // 오류 발생 여부 확인
         // true === error, false === no error
-        const isOnErr = !pwValid || pwCheckValid || !nameValid || yearValid || monthValid || dayValid || phoneNumberValid;
-        if (isOnErr) {
+        dataValidationError = !pwValid || pwCheckValid || !nameValid || yearValid || monthValid || dayValid || phoneNumberValid;
+        if (dataValidationError) {
             // 하나라도 true 라면 console : error
-            // console.log('error');
+            console.log('error');
+            // setIsOnErrDataValidation(true);
             return;
         } else {
             // 전부다 false 라면 console: no err
             // 검사 통과
-            // console.log('no error');
+            console.log('no error');
             const prepareData = { ...data };
             // 연락처 010 추가
             prepareData.phoneNumber = '010-' + prepareData.phoneNumber.slice(0, 4)
@@ -288,7 +300,6 @@ export default function SignUpPage() {
             // ConfirmModal on, set data
             setPrepareData(prepareData);
         }
-        // console.log('validation end');
     };
     // confirm modal close
     const handleModalClose = () => {

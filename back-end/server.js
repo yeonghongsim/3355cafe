@@ -59,6 +59,8 @@ app.post('/signUp', async function (req, res) {
             gender: req.body.gender,
             role: req.body.role,
             isVanned: req.body.isVanned,
+            boardLikeList: req.body.boardLikeList,
+            replyLikeList: req.body.replyLikeList,
         }, function (error, result) {
             if (error) {
                 console.error('Error inserting data into the database:', error);
@@ -70,6 +72,22 @@ app.post('/signUp', async function (req, res) {
             }
         })
     } catch (error) {
+        console.error('Error processing signUp request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// 사용자 로그인 코드
+app.get('/login', async function (req, res) {
+    try {
+        console.log('Login processing start');
+        console.log('userId : ' + req.query.userId);
+        console.log('userPassword : ' + req.query.userPassword);
+        db.collection('users').findOne({ userId: req.query.userId, userPassword: req.query.userPassword }, function (error, result) {
+            console.log(result)
+            res.send({ result: result })
+        })
+    }
+    catch (error) {
         console.error('Error processing signUp request:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }

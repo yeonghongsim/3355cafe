@@ -2,7 +2,7 @@ import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import { COLORS } from "../../../commons/styles/COLORS";
 import LoginInputWithLabel01 from "../../commons/input/LoginInputWithLabel01";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -50,7 +50,7 @@ const Text = styled.p`
     font-weight: normal;
     color: black;
     margin: 0;
-    margin-top: 2rem;
+    margin-top: 1rem;
     padding-left: 0.5rem;
     &:hover {
         cursor: pointer;
@@ -84,28 +84,75 @@ const Btn = styled.div`
     }
 `;
 // 오류 발생 시 코드 만들었을때 사용예정
-// const ErrorAnnounceText = styled.p`
-//     font-size: 1.4rem;
-//     font-weight: normal;
-//     color: red;
-//     padding-left: 0.5rem;
-//     margin: 0;
-// `;
+const ErrorAnnounceText = styled.p`
+    font-size: 1.4rem;
+    font-weight: normal;
+    color: red;
+    padding-left: 0.5rem;
+    margin: 0;
+`;
 
 export default function LoginPage() {
     const userIdRef = useRef(null);
     const userPwRef = useRef(null);
+    let [errorLogin, setErrorLogin] = useState();
 
 
     const handleFindInfo = () => {
         console.log('try to find id/pw')
     };
-    const handleLoginBtnClick = () => {
+    const handleLoginBtnClick = async () => {
         const data = {
             userId: userIdRef.current.value,
-            userPw: userPwRef.current.value
+            userPassword: userPwRef.current.value
         }
-        console.log(data)
+        // get Url
+        const url = 'http://localhost:8080/login';
+        // 객체를 쿼리 문자열로 변환
+        const queryString = new URLSearchParams(data).toString();
+        // url에 쿼리 문자열 추가
+        const fullUrl = `${url}?${queryString}`;
+        fetch(fullUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json' // 요청 헤더 설정 (JSON을 사용하는 경우)
+            }
+        })
+            .then(response => {
+                return response.json();
+            })
+            .then(data => {
+                if (data.result == null) {
+                    console.log('회원정보 불일치');
+                    setErrorLogin(true);
+                } else {
+                    console.log('회원정보 일치');
+                    console.log(data.result);
+                    setErrorLogin(false);
+                    // const userInfo = {
+                    //     _id: data.result._id,
+                    //     userId: data.result.userId,
+                    //     userName: data.result.userName,
+                    //     birth: data.result.birth,
+                    //     phoneNumber: data.result.phoneNumber,
+                    //     profileImgURL: data.result.profileImgURL,
+                    //     profileImgName: data.result.profileImgName,
+                    //     gender: data.result.gender,
+                    //     role: data.result.role,
+                    //     isVanned: data.result.isVanned,
+                    //     boardLikeList: data.result.boardLikeList,
+                    //     replyLikeList: data.result.replyLikeList,
+                    // }
+                    // console.log(userInfo);
+                    // store에 저장
+                    // store.dispatch(setUser(userInfo));
+                    // 페이지 이동
+                    // navigate('/');
+                }
+            })
+            .catch(error => {
+                console.error('error : ' + error);
+            })
     };
 
     return (
@@ -135,9 +182,11 @@ export default function LoginPage() {
                             forwardRef={userPwRef}
                         ></LoginInputWithLabel01>
                     </Layer>
-                    {/* <Layer>
-                        <ErrorAnnounceText>1212</ErrorAnnounceText>
-                    </Layer> */}
+                    {
+                        errorLogin && <Layer>
+                            <ErrorAnnounceText>*아이디 또는 비밀번호를 확인해 주세요.</ErrorAnnounceText>
+                        </Layer>
+                    }
                     <Layer onClick={handleFindInfo}>
                         <Text>아이디 / 비밀번호 찾기</Text>
                     </Layer>
