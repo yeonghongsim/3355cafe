@@ -1,7 +1,7 @@
 import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -100,19 +100,36 @@ const NoticeSection = styled.section`
     width: 100%;
     height: 5vh;
 `;
-const NoticeContainer = styled.div`
+const NoticeWrapper = styled.div`
     width: 100%;
     height: 100%;
     display: flex;
-    // flex-direction: column;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    z-index: 100;
+    overflow: hidden;
+`;
+const NoticeContainer = styled.div`
+    width: 100%;
+    height: 5vh;
+    display: flex;
     align-items: center;
     justify-content: flex-start;
     padding-left: 1rem;
+    box-sizing: border-box;
+    transform: translateY(-${props => props.$noticeCount * 100}%);
+    transition: transform 0.75s;
+    pointerEvents: ${(props) => (props.$isNoticeHovered ? 'none' : 'auto')}
 `;
 const NoticeText = styled.p`
     font-size: 1.6rem;
     font-weight: normal;
     color: black;
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 `;
 const BodySection = styled.section`
     width: 100%;
@@ -217,6 +234,31 @@ export default function HomePage(props) {
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
     }, []);
+    // notice section 부분 slide animation function
+    const [noticeCount, setNoticeCount] = useState(0);
+    const [isNoticeHovered, setIsNoticeHovered] = useState(false);
+    // 공지사항 인덱스를 업데이트하는 함수
+    const updateNoticeIndex = useCallback(() => {
+        if (!isNoticeHovered) {
+            setNoticeCount(prevCount => (prevCount + 1) % imsiNoticeTextList.length);
+        }
+    }, [isNoticeHovered, imsiNoticeTextList.length]);
+
+    // 마우스 호버 이벤트 핸들러
+    const handleMouseEnter = () => {
+        setIsNoticeHovered(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsNoticeHovered(false);
+    };
+
+    useEffect(() => {
+        // 3초마다 공지사항 인덱스 업데이트
+        const interval = setInterval(updateNoticeIndex, 3300);
+        // 컴포넌트가 unmount될 때 clearInterval 호출하여 메모리 누수 방지
+        return () => clearInterval(interval);
+    }, [updateNoticeIndex]);
 
     return (
         <Wrapper>
@@ -259,16 +301,23 @@ export default function HomePage(props) {
             </NavbarSection>
             <NoticeSection>
                 <SmallWrapper>
-                    <NoticeContainer>
+                    <NoticeWrapper>
                         {
-                            imsiNoticeTextList.map((text, i) =>
-                                <NoticeText key={i}>
-                                    {text}
-                                </NoticeText>
+                            imsiNoticeTextList.map((notice, i) =>
+                                <NoticeContainer
+                                    key={i}
+                                    $noticeCount={noticeCount}
+                                    $isNoticeHovered={isNoticeHovered}
+                                    onMouseEnter={handleMouseEnter}
+                                    onMouseLeave={handleMouseLeave}
+                                >
+                                    <NoticeText>
+                                        {notice}
+                                    </NoticeText>
+                                </NoticeContainer>
                             )
                         }
-                        settimeout 사용해서 로테이션 해보기
-                    </NoticeContainer>
+                    </NoticeWrapper>
                 </SmallWrapper>
             </NoticeSection>
             <BodySection>

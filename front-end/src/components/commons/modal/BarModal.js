@@ -155,7 +155,11 @@ export default function BarModal({
                         </ProfileImageWrapper>
                     </ProfileImageContainer>
                     <ProfileNameContainer>
-                        <ProfileName>Guest
+                        <ProfileName>
+                            {
+                                userInfo === null ?
+                                    'Guest' : userInfo.userName
+                            }
                             <ProfileText>님</ProfileText>
                         </ProfileName>
                     </ProfileNameContainer>
