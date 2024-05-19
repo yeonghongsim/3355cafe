@@ -4,6 +4,8 @@ import { COLORS } from "../../../commons/styles/COLORS";
 import LoginInputWithLabel01 from "../../commons/input/LoginInputWithLabel01";
 import { useRef, useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import store from "../../../commons/store/store";
+import { setUser } from "../../../commons/store/userSlice";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -128,25 +130,25 @@ export default function LoginPage() {
                     setErrorLogin(true);
                 } else {
                     console.log('회원정보 일치');
-                    console.log(data.result);
+                    // console.log(data.result);
                     setErrorLogin(false);
-                    // const userInfo = {
-                    //     _id: data.result._id,
-                    //     userId: data.result.userId,
-                    //     userName: data.result.userName,
-                    //     birth: data.result.birth,
-                    //     phoneNumber: data.result.phoneNumber,
-                    //     profileImgURL: data.result.profileImgURL,
-                    //     profileImgName: data.result.profileImgName,
-                    //     gender: data.result.gender,
-                    //     role: data.result.role,
-                    //     isVanned: data.result.isVanned,
-                    //     boardLikeList: data.result.boardLikeList,
-                    //     replyLikeList: data.result.replyLikeList,
-                    // }
+                    const userInfo = {
+                        _id: data.result._id,
+                        userId: data.result.userId,
+                        userName: data.result.userName,
+                        birth: data.result.birth,
+                        phoneNumber: data.result.phoneNumber,
+                        profileImgURL: data.result.profileImgURL,
+                        profileImgName: data.result.profileImgName,
+                        gender: data.result.gender,
+                        role: data.result.role,
+                        isVanned: data.result.isVanned,
+                        boardLikeList: data.result.boardLikeList,
+                        replyLikeList: data.result.replyLikeList,
+                    }
                     // console.log(userInfo);
                     // store에 저장
-                    // store.dispatch(setUser(userInfo));
+                    store.dispatch(setUser(userInfo));
                     // 페이지 이동
                     navigate('/');
                 }

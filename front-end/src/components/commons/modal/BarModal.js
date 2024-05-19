@@ -2,6 +2,8 @@ import { useEffect, useRef } from "react";
 import styled from "styled-components"
 import LoginBtn from "../button/LoginBtn";
 import SignupBtn from "../button/SignupBtn";
+import LogoutBtn from "../button/LogoutBtn";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 25rem;
@@ -14,10 +16,12 @@ const Wrapper = styled.div`
     right: 0;
     overflow: hidden;
     opacity: ${(props) => (props.$isOn === 'true' ? 1 : 0)};
-    transition: all 1.2s ease-in-out;
+    transition: max-height .9s ease-in-out, opacity .6s ease-in-out;
+    // transition: all 1.2s ease-in-out;
     z-index: 200;
     padding: 0.5rem;
     box-sizing: border-box;
+    // display: ${(props) => (props.$isOn ? 'block' : 'none')};
 `;
 const ModalContainer = styled.div`
     width: 100%;
@@ -116,10 +120,10 @@ const ButtonContainer = styled.div`
 `;
 
 export default function BarModal({
-    props
-    , isOn
+    isOn
     , handleModalClose
 }) {
+    const userInfo = useSelector((state) => state.user.user);
     const modalRef = useRef(null);
 
     useEffect(() => {
@@ -156,16 +160,29 @@ export default function BarModal({
                         </ProfileName>
                     </ProfileNameContainer>
                 </ProfileContainer>
-                <ContentContainer>
-                    <ContentText $afterText="true">회원 정보</ContentText>
-                    <ContentText $afterText="false">게시글(n)</ContentText>
-                </ContentContainer>
-                <ButtonContainer>
-                    <LoginBtn></LoginBtn>
-                </ButtonContainer>
-                <ButtonContainer>
-                    <SignupBtn></SignupBtn>
-                </ButtonContainer>
+                {
+                    userInfo === null ?
+                        <>
+                            <ButtonContainer>
+                                <LoginBtn></LoginBtn>
+                            </ButtonContainer>
+                            <ButtonContainer>
+                                <SignupBtn></SignupBtn>
+                            </ButtonContainer>
+                        </>
+                        :
+                        <>
+                            <ContentContainer>
+                                <ContentText $afterText="true">회원 정보</ContentText>
+                                <ContentText $afterText="false">게시글(n)</ContentText>
+                            </ContentContainer>
+                            <ButtonContainer>
+                                <LogoutBtn
+                                    handleModalClose={handleModalClose}
+                                ></LogoutBtn>
+                            </ButtonContainer>
+                        </>
+                }
             </ModalContainer>
         </Wrapper>
     )
