@@ -133,7 +133,7 @@ const NoticeText = styled.p`
 `;
 const BodySection = styled.section`
     width: 100%;
-    height: 68vh;
+    height: 65vh;
 `;
 const BodyContainer = styled.div`
     width: 100%;
@@ -145,9 +145,70 @@ const BodyContainer = styled.div`
 const BodyContainerLeft = styled.div`
     width: 60%;
     height: 100%;
-    background-color: lightgreen;
-    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    // padding: 0.5rem;
+    // box-sizing: border-box;
+`;
+const AdImageListFullContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border-radius: 1rem;
+    box-shadow: 0 0.4rem 1.2rem 0 rgba(0, 0, 0, 0.15);
+`;
+const AdImageIndexContainer = styled.div`
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 1rem;
     box-sizing: border-box;
+`;
+const AdImageIndexText = styled.p`
+    font-size: 1.6rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    cursor: normal;
+    ${props => props.$beforeText && `
+    &::before {
+        content: '/';
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        font-size: 1.4rem;
+    `}
+}
+`;
+const AdImageListContainer = styled.div`
+    width: 100%;
+    height: calc(100% - 3rem);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    border-radius: 0 0 1rem 1rem;
+    overflow: hidden;
+`
+const AdImageListWrapper = styled.div`
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+`;
+const AdImage = styled.img`
+    width: 100%;
+    height: 100%;
+     flex-shrink: 0;
+    // border-radius: 1rem;
+    object-fit: cover;
+    // padding: 0.5rem;
+    // box-sizing: border-box;
+    cursor: pointer;
 `;
 const BodyContainerRight = styled.div`
     width: 40%;
@@ -160,13 +221,14 @@ const BodyContainerRight = styled.div`
 const BodyContainerRightSmall = styled.div`
     width: 100%;
     height: 50%;
-    background-color: ${props => props.$bgColor};
+    // background-color: ${props => props.$bgColor};
     padding: 1rem;
     box-sizing: border-box;
 `;
 const FooterSection = styled.section`
     width: 100%;
     height: 7vh;
+    margin-top: 3vh;
     background: linear-gradient(#eee, #d9d9d9);
 `;
 const FooterContainer = styled.div`
@@ -185,11 +247,11 @@ const FooterCopyrightContainer = styled.div`
     padding: 0 1rem 0 1rem;
 `;
 const CopyrightImg = styled.img`
-    width: 2.4rem;
-    height: 2.4rem;
+    width: 2rem;
+    height: 2rem;
 `;
 const CopyrightText = styled.p`
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
     color: black;
 `;
@@ -202,7 +264,7 @@ const FooterTextContainer = styled.div`
     gap: 1rem;
 `;
 const FooterText = styled.p`
-    font-size: 1.6rem;
+    font-size: 1.5rem;
     font-weight: bold;
     color: black;
     &:hover {
@@ -217,13 +279,17 @@ const FooterText = styled.p`
     &::after {
         padding-left: 1rem;
         content: "|";
-        font-size: 1.6rem;
+        font-size: 1.5rem;
     }
     `}
 `;
 
 export default function HomePage(props) {
     const imsiNoticeTextList = ['공지사항1', '공지사항2', '공지사항3'];
+    const imsiImageList = ['/image/imsiImage1.jpeg', '/image/imsiImage2.jpeg'
+        , '/image/imsiImage3.jpeg'];
+    // gpt가 알려준 image 관련 추가 코드 01
+
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // modal open/close
     const handleBarModal = (e) => {
@@ -252,7 +318,7 @@ export default function HomePage(props) {
     const handleMouseLeave = () => {
         setIsNoticeHovered(false);
     };
-
+    // 공지 사항 관련 슬라이드 세팅
     useEffect(() => {
         // 3초마다 공지사항 인덱스 업데이트
         const interval = setInterval(updateNoticeIndex, 3300);
@@ -324,7 +390,26 @@ export default function HomePage(props) {
                 <SmallWrapper>
                     <BodyContainer>
                         <BodyContainerLeft>
-                            이미지 슬라이드
+                            <AdImageListFullContainer>
+                                <AdImageIndexContainer>
+                                    <AdImageIndexText $beforeText={false}>
+                                        현재 이미지 index
+                                    </AdImageIndexText>
+                                    <AdImageIndexText $beforeText={true}>
+                                        {imsiImageList.length}
+                                    </AdImageIndexText>
+                                </AdImageIndexContainer>
+                                <AdImageListContainer>
+                                    <AdImageListWrapper
+                                    >
+                                        {
+                                            imsiImageList.map((image, i) => (
+                                                <AdImage src={image} key={i}></AdImage>
+                                            ))
+                                        }
+                                    </AdImageListWrapper>
+                                </AdImageListContainer>
+                            </AdImageListFullContainer>
                         </BodyContainerLeft>
                         <BodyContainerRight>
                             <BodyContainerRightSmall $bgColor="lightblue">
