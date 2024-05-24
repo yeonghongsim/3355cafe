@@ -29,7 +29,7 @@ MongoClient.connect('mongodb+srv://admin:qwer1234@cluster0.qme18ml.mongodb.net/?
         })
     })
 
-// 아이디 확인 용
+// signUp page, id check
 app.get('/checkId/:imsiId', async function (req, res) {
     try {
         console.log('Received a checkId request from the front end.');
@@ -43,7 +43,7 @@ app.get('/checkId/:imsiId', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 })
-// 사용자 회원가입 코드
+// signUp page, register user info
 app.post('/signUp', async function (req, res) {
     try {
         console.log('Received a signUp request from the front end.');
@@ -76,7 +76,7 @@ app.post('/signUp', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-// 사용자 로그인 코드
+// login page, user login
 app.get('/login', async function (req, res) {
     try {
         console.log('Login processing start');
@@ -89,6 +89,18 @@ app.get('/login', async function (req, res) {
     }
     catch (error) {
         console.error('Error processing signUp request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board page, get board category list
+app.get('/boardType', async function (req, res) {
+    try {
+        console.log('boardType processing start');
+
+        const result = await db.collection('boardType').find({}).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting boardType data:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });

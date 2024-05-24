@@ -2,6 +2,8 @@ import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -175,40 +177,64 @@ const AdImageIndexText = styled.p`
     font-weight: normal;
     color: black;
     margin: 0;
-    cursor: normal;
     ${props => props.$beforeText && `
-    &::before {
-        content: '/';
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-        font-size: 1.4rem;
-    `}
-}
+        &::before {
+            content: '/';
+            font-size: 1.4rem;
+            font-weight: normal;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        `
+    }
 `;
-const AdImageListContainer = styled.div`
+const AdImageListWrapper = styled.div`
     width: 100%;
     height: calc(100% - 3rem);
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
     border-radius: 0 0 1rem 1rem;
     overflow: hidden;
-`
-const AdImageListWrapper = styled.div`
-    height: 100%;
+    position: relative;
+`;
+const AdImageMoveClick = styled.div`
+    width: 5rem;
+    height: 5rem;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    left: ${(props) => (props.$way === 'left' ? '1rem' : 'unset')};
+    right: ${(props) => (props.$way === 'right' ? '1rem' : 'unset')};
+    top: 50%;
+    opacity: 0.5;
+    box-shadow: 0 0.4rem 1.2rem 0 rgba(0, 0, 0, 0.25);
+    transition: all 0.75s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+    &:hover {
+        opacity: 1;
+        cursor: pointer;
+    }
+`;
+const AdImageMoveClickImg = styled.img`
+    width: 50%;
+    height: 50%;
+    flex-shrink: 0;
+`;
+const AdImageListContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    transform: translateX(-${props => props.$imageNowIndex * 100}%);
+    transition: transform 1.35s ease;
+    will-change: transform;
 `;
 const AdImage = styled.img`
     width: 100%;
     height: 100%;
-     flex-shrink: 0;
-    // border-radius: 1rem;
+    flex-shrink: 0;
     object-fit: cover;
-    // padding: 0.5rem;
-    // box-sizing: border-box;
-    cursor: pointer;
 `;
 const BodyContainerRight = styled.div`
     width: 40%;
@@ -285,36 +311,35 @@ const FooterText = styled.p`
 `;
 
 export default function HomePage(props) {
-    const imsiNoticeTextList = ['공지사항1', '공지사항2', '공지사항3'];
-    const imsiImageList = ['/image/imsiImage1.jpeg', '/image/imsiImage2.jpeg'
-        , '/image/imsiImage3.jpeg'];
-    // gpt가 알려준 image 관련 추가 코드 01
-
+    // userInfo section
+    const userInfo = useSelector((state) => state.user.user);
+    // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
-    // modal open/close
+    // up-right side bar modal open/close
     const handleBarModal = (e) => {
         e.stopPropagation();
         setIsOnBarModal(!isOnBarModal);
     };
-    // modal close
+    // up-right side  modal close
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
     }, []);
+    // notice section
+    const imsiNoticeTextList = ['공지사항1', '공지사항2', '공지사항3'];
     // notice section 부분 slide animation function
     const [noticeCount, setNoticeCount] = useState(0);
     const [isNoticeHovered, setIsNoticeHovered] = useState(false);
-    // 공지사항 인덱스를 업데이트하는 함수
+    // notice text hovering
     const updateNoticeIndex = useCallback(() => {
         if (!isNoticeHovered) {
             setNoticeCount(prevCount => (prevCount + 1) % imsiNoticeTextList.length);
         }
     }, [isNoticeHovered, imsiNoticeTextList.length]);
-
-    // 마우스 호버 이벤트 핸들러
+    // notice text mouse hover event handler
     const handleMouseEnter = () => {
         setIsNoticeHovered(true);
     };
-
+    // notice text mouse hover event handler
     const handleMouseLeave = () => {
         setIsNoticeHovered(false);
     };
@@ -325,6 +350,50 @@ export default function HomePage(props) {
         // 컴포넌트가 unmount될 때 clearInterval 호출하여 메모리 누수 방지
         return () => clearInterval(interval);
     }, [updateNoticeIndex]);
+    // Ad image section
+    const imsiImageList = ['/image/imsiImage1.jpeg', '/image/imsiImage2.jpeg'
+        , '/image/imsiImage3.jpeg'];
+    let [currentImageIndex, setCurrentImageIndex] = useState(0);
+    let [adImageIntervalId, setAdImageIntervalId] = useState(null);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === imsiImageList.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 5000);
+
+        setAdImageIntervalId(interval);
+
+        return () => clearInterval(interval);
+    }, [
+        imsiImageList.length
+    ]);
+    const adImageResetInterval = () => {
+        if (adImageIntervalId) {
+            clearInterval(adImageIntervalId);
+        }
+        const newInterval = setInterval(() => {
+            setCurrentImageIndex((prevIndex) =>
+                prevIndex === imsiImageList.length - 1 ? 0 : prevIndex + 1
+            );
+        }, 5000);
+
+        setAdImageIntervalId(newInterval);
+    };
+    const handleMovePrevImg = (e) => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === 0 ? imsiImageList.length - 1 : prevIndex - 1
+        );
+        e.stopPropagation();
+        adImageResetInterval();
+    };
+    const handleMoveNextImg = (e) => {
+        setCurrentImageIndex((prevIndex) =>
+            prevIndex === imsiImageList.length - 1 ? 0 : prevIndex + 1
+        );
+        e.stopPropagation();
+        adImageResetInterval();
+    };
 
     return (
         <Wrapper>
@@ -353,15 +422,18 @@ export default function HomePage(props) {
                 <SmallWrapper>
                     <NavbarContainer>
                         <Navbar>
-                            <NavText>
+                            <NavText onClick={OnClickMoveToPage('/board')}>
                                 게시판
                             </NavText>
                         </Navbar>
-                        <Navbar>
-                            <NavText>
-                                관리자모드
-                            </NavText>
-                        </Navbar>
+                        {
+                            userInfo.role === 'ADMIN' ?
+                                <Navbar>
+                                    <NavText>
+                                        관리자모드
+                                    </NavText>
+                                </Navbar> : null
+                        }
                     </NavbarContainer>
                 </SmallWrapper>
             </NavbarSection>
@@ -393,22 +465,40 @@ export default function HomePage(props) {
                             <AdImageListFullContainer>
                                 <AdImageIndexContainer>
                                     <AdImageIndexText $beforeText={false}>
-                                        현재 이미지 index
+                                        {currentImageIndex + 1}
                                     </AdImageIndexText>
                                     <AdImageIndexText $beforeText={true}>
                                         {imsiImageList.length}
                                     </AdImageIndexText>
                                 </AdImageIndexContainer>
-                                <AdImageListContainer>
-                                    <AdImageListWrapper
+                                <AdImageListWrapper
+                                >
+                                    <AdImageListContainer
+                                        $imageNowIndex={currentImageIndex}
                                     >
                                         {
-                                            imsiImageList.map((image, i) => (
-                                                <AdImage src={image} key={i}></AdImage>
+                                            imsiImageList.map((image, idx) => (
+                                                <AdImage src={image} key={idx}></AdImage>
                                             ))
                                         }
-                                    </AdImageListWrapper>
-                                </AdImageListContainer>
+                                    </AdImageListContainer>
+                                    <AdImageMoveClick
+                                        $way='left'
+                                    >
+                                        <AdImageMoveClickImg
+                                            src="/image/arrow-left.svg"
+                                            onClick={handleMovePrevImg}
+                                        ></AdImageMoveClickImg>
+                                    </AdImageMoveClick>
+                                    <AdImageMoveClick
+                                        $way='right'
+                                    >
+                                        <AdImageMoveClickImg
+                                            src="/image/arrow-right.svg"
+                                            onClick={handleMoveNextImg}
+                                        ></AdImageMoveClickImg>
+                                    </AdImageMoveClick>
+                                </AdImageListWrapper>
                             </AdImageListFullContainer>
                         </BodyContainerLeft>
                         <BodyContainerRight>
