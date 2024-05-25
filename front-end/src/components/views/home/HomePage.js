@@ -4,6 +4,9 @@ import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
+import axios from "axios";
+import store from "../../../commons/store/store";
+import { setBoardTypeList } from "../../../commons/store/boardTypeList";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -311,6 +314,29 @@ const FooterText = styled.p`
 `;
 
 export default function HomePage(props) {
+    // boardtypeList search n save in store
+    // get boardTypeList in store
+    const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
+    useEffect(() => {
+        if (boardTypeList !== null) {
+            let boardType;
+            const fetchItems = async () => {
+                try {
+                    const fullURL = `http://localhost:8080/boardType`;
+                    const response = await axios.get(fullURL);
+                    boardType = await response.data;
+                    // setItemList(await response.data);
+                    // setIsLoading(false);
+                    store.dispatch(setBoardTypeList(boardType));
+                } catch (error) {
+                    console.error('Error getting itemType data:', error);
+                    throw error;
+                }
+            };
+            // fetchUserItems를 의존성 배열에 추가
+            fetchItems();
+        }
+    }, [boardTypeList]);
     // userInfo section
     const userInfo = useSelector((state) => state.user.user);
     // bar modal section

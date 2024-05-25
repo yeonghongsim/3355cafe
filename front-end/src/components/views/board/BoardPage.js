@@ -1,9 +1,11 @@
 import styled from "styled-components";
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
-import { useCallback, useEffect, useState } from "react";
-import axios from "axios";
-
+import { useCallback, useState } from "react";
+import { useSelector } from "react-redux";
+import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
+import { Outlet, useLocation } from "react-router-dom";
+import BoardBodyContainer from "./BoardBodyContainer";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -98,8 +100,15 @@ const NavText = styled.h1`
         cursor: pointer;
     }
 `;
+const BodySection = styled.section`
+    width: 100%;
+    height: 80vh;
+`;
 
 export default function BoardPage() {
+    const location = useLocation();
+    // get boardTypeList in store
+    const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close
@@ -110,26 +119,6 @@ export default function BoardPage() {
     // up-right side  modal close
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
-    }, []);
-
-    // 게시글 타입 조회
-    useEffect(() => {
-        let boardType;
-        const fetchItems = async () => {
-            try {
-                const fullURL = `http://localhost:8080/boardType`;
-                const response = await axios.get(fullURL);
-                boardType = await response.data;
-                // setItemList(await response.data);
-                // setIsLoading(false);
-                console.log(boardType);
-            } catch (error) {
-                console.error('Error getting itemType data:', error);
-                throw error;
-            }
-        };
-        // fetchUserItems를 의존성 배열에 추가
-        fetchItems();
     }, []);
 
     return (
@@ -159,13 +148,31 @@ export default function BoardPage() {
                 <SmallWrapper>
                     <NavbarContainer>
                         <Navbar>
-                            <NavText>
-                                게시판
+                            <NavText onClick={OnClickMoveToPage('/board')}>
+                                전체
                             </NavText>
                         </Navbar>
+                        {
+                            boardTypeList.map((boardType, idx) => (
+                                <Navbar key={idx}>
+                                    <NavText onClick={OnClickMoveToPage(boardType.url)}>
+                                        {boardType.name}
+                                    </NavText>
+                                </Navbar>
+                            ))
+                        }
                     </NavbarContainer>
                 </SmallWrapper>
             </NavbarSection>
+            <BodySection>
+                <SmallWrapper>
+                    {
+                        location.pathname === '/board'
+                            ? <BoardBodyContainer $location={location.pathname}></BoardBodyContainer> :
+                            <Outlet></Outlet>
+                    }
+                </SmallWrapper>
+            </BodySection>
         </Wrapper>
     )
 }
