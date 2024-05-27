@@ -109,9 +109,6 @@ const BoardContainer = styled.div`
     border-bottom: 1px solid #d9d9d9;` : null
     }
     box-sizing: border-box;
-    &:hover {
-        cursor: pointer;
-    }
 `;
 const BoardTypeWrapper = styled.div`
     width: 8%;
@@ -136,9 +133,11 @@ const BoardTitleWrapper = styled.div`
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background-color: #eee;
     font-size: 1.4rem;
+    padding-left: 1rem;
+    box-sizing: border-box;
 `;
 const BoardViewsWrapper = styled.div`
     width: 10%;
@@ -180,7 +179,11 @@ export default function BoardBodyContainer({
     const handleSearchImgClick = () => {
         const searchData = searchInputRef.current.value;
         console.log(searchData);
-        window.location.href = '/board/search';
+        // window.location.href = '/board/search';
+    };
+    // click board, move to board detail
+    const handleClickBoard = () => {
+        window.location.href = '/boardDetail';
     };
 
     return (
@@ -201,7 +204,10 @@ export default function BoardBodyContainer({
                 <BoardListContainer>
                     {
                         imsiBoardList.map((board, idx) => (
-                            <BoardContainer key={idx} $boardIndex={idx + 1}>
+                            <BoardContainer
+                                key={idx}
+                                $boardIndex={idx + 1}
+                                onClick={handleClickBoard}>
                                 <BoardTypeWrapper>글타입</BoardTypeWrapper>
                                 <BoardWriterWrapper>작성자</BoardWriterWrapper>
                                 <BoardTitleWrapper>제목</BoardTitleWrapper>

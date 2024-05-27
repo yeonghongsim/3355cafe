@@ -7,6 +7,7 @@ import SignUpPage from './components/views/signup/SignUpPage';
 import LoginPage from './components/views/login/LoginPage';
 import BoardPage from './components/views/board/BoardPage';
 import BoardBodyContainer from './components/views/board/BoardBodyContainer';
+import BoardDetailPage from './components/views/boardDetail/BoardDetailPage';
 import Test1 from './components/views/test/Test1';
 import Test2Select from './components/views/test/Test2Select';
 import Test3If from './components/views/test/Test3If';
@@ -41,6 +42,7 @@ function App() {
           }
           <Route path='search' element={<BoardBodyContainer $location='/board/search' />}></Route>
         </Route>
+        <Route path='/boardDetail' element={< BoardDetailPage />}></Route>
         <Route path='/test1' element={< Test1 />}></Route>
         <Route path='/test2' element={< Test2Select />}></Route>
         <Route path='/test3' element={< Test3If />}></Route>
