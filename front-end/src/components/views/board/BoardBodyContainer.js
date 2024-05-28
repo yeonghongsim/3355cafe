@@ -1,6 +1,7 @@
 import styled from "styled-components"
 import { COLORS } from "../../../commons/styles/COLORS";
 import { useRef } from "react";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -10,15 +11,41 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 `;
-const SearchBarSection = styled.section`
+const RegisterBoardWithSearchBarSection = styled.section`
     width: 100%;
     height: 8vh;
     // background-color: #eee;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    // justify-content: space-between;
+    justify-content: ${(props) => (props.$userInfo === null ?
+        'flex-end' : 'space-between'
+    )};
     // padding-right: 1rem;
     // box-sizing: border-box;
+`;
+const RegisterBoardBtnContainer = styled.div`
+    width: 10rem;
+    height: 4rem;
+    background-color: #eee;
+    border-radius: 0.5rem;
+`;
+const RegisterBoardBtn = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.5rem;
+    background-color: ${COLORS.greenColor};
+    &:hover {
+        cursor: pointer;
+    }
+`;
+const RegisterBoardBtnText = styled.p`
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: white;
 `;
 const SearchBarContainer = styled.div`
     width: 30rem;
@@ -171,6 +198,8 @@ export default function BoardBodyContainer({
     $location
 }) {
     console.log($location);
+    // get userinfo in store
+    const userInfo = useSelector((state) => state.user.user);
     // imsi list for after get board list
     const imsiBoardList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     // search input ref
@@ -185,10 +214,24 @@ export default function BoardBodyContainer({
     const handleClickBoard = () => {
         window.location.href = '/boardDetail';
     };
+    // click btn, move to register board
+    const handleClickResisterBoardBtn = () => {
+        console.log(userInfo);
+        window.location.href = '/register/board';
+    };
 
     return (
         <Wrapper>
-            <SearchBarSection>
+            <RegisterBoardWithSearchBarSection $userInfo={userInfo}>
+                {
+                    userInfo !== null ?
+                        <RegisterBoardBtnContainer>
+                            <RegisterBoardBtn
+                                onClick={handleClickResisterBoardBtn}>
+                                <RegisterBoardBtnText>글쓰기</RegisterBoardBtnText>
+                            </RegisterBoardBtn>
+                        </RegisterBoardBtnContainer> : null
+                }
                 <SearchBarContainer>
                     <SearchBarInputWrapper>
                         <SearchBarInput ref={searchInputRef}></SearchBarInput>
@@ -199,7 +242,7 @@ export default function BoardBodyContainer({
                         <SearchBarImg src="/image/search.svg"></SearchBarImg>
                     </SearchBarImgWrapper>
                 </SearchBarContainer>
-            </SearchBarSection>
+            </RegisterBoardWithSearchBarSection>
             <BoardListSection>
                 <BoardListContainer>
                     {
@@ -210,7 +253,7 @@ export default function BoardBodyContainer({
                                 onClick={handleClickBoard}>
                                 <BoardTypeWrapper>글타입</BoardTypeWrapper>
                                 <BoardWriterWrapper>작성자</BoardWriterWrapper>
-                                <BoardTitleWrapper>제목</BoardTitleWrapper>
+                                <BoardTitleWrapper>100000000910000000091000000009100</BoardTitleWrapper>
                                 <BoardViewsWrapper>조회수</BoardViewsWrapper>
                                 <BoardEmotionWrapper>좋아요/싫어요</BoardEmotionWrapper>
                                 <BoardDateWrapper>작성일</BoardDateWrapper>

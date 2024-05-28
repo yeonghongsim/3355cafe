@@ -453,7 +453,7 @@ export default function HomePage(props) {
                             </NavText>
                         </Navbar>
                         {
-                            userInfo.role === 'ADMIN' ?
+                            userInfo?.role === 'ADMIN' ?
                                 <Navbar>
                                     <NavText>
                                         관리자모드

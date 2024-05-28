@@ -8,6 +8,7 @@ import LoginPage from './components/views/login/LoginPage';
 import BoardPage from './components/views/board/BoardPage';
 import BoardBodyContainer from './components/views/board/BoardBodyContainer';
 import BoardDetailPage from './components/views/boardDetail/BoardDetailPage';
+import RegisterBoardPage from './components/views/register/board/RegisterBoardPage';
 import Test1 from './components/views/test/Test1';
 import Test2Select from './components/views/test/Test2Select';
 import Test3If from './components/views/test/Test3If';
@@ -16,6 +17,7 @@ import Test5Route from './components/views/test/Test5Route';
 import Test501 from './components/views/test/Test501';
 import Test502 from './components/views/test/Test502';
 import Test503 from './components/views/test/Test503';
+import Test6RegiBoard from './components/views/test/Test6RegiBoard';
 import { useSelector } from 'react-redux';
 
 
@@ -43,6 +45,9 @@ function App() {
           <Route path='search' element={<BoardBodyContainer $location='/board/search' />}></Route>
         </Route>
         <Route path='/boardDetail' element={< BoardDetailPage />}></Route>
+        <Route path='/register'>
+          <Route path='board' element={<RegisterBoardPage />}></Route>
+        </Route>
         <Route path='/test1' element={< Test1 />}></Route>
         <Route path='/test2' element={< Test2Select />}></Route>
         <Route path='/test3' element={< Test3If />}></Route>
@@ -52,6 +57,7 @@ function App() {
           <Route path='2' element={<Test502 />} />
           <Route path='3' element={<Test503 />} />
         </Route>
+        <Route path='/test6' element={< Test6RegiBoard />}></Route>
       </Routes>
     </Wrapper>
   );
