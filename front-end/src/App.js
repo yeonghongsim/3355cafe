@@ -18,6 +18,8 @@ import Test501 from './components/views/test/Test501';
 import Test502 from './components/views/test/Test502';
 import Test503 from './components/views/test/Test503';
 import Test6RegiBoard from './components/views/test/Test6RegiBoard';
+import Test6GetBoardList from './components/views/test/Test6GetBoardList';
+import Test6GetBoard from './components/views/test/Test6GetBoard';
 import { useSelector } from 'react-redux';
 
 
@@ -57,7 +59,11 @@ function App() {
           <Route path='2' element={<Test502 />} />
           <Route path='3' element={<Test503 />} />
         </Route>
-        <Route path='/test6' element={< Test6RegiBoard />}></Route>
+        <Route path='/test6'>
+          <Route path='1' element={< Test6RegiBoard />}></Route>
+          <Route path='2' element={< Test6GetBoardList />}></Route>
+          <Route path='3' element={< Test6GetBoard />}></Route>
+        </Route>
       </Routes>
     </Wrapper>
   );

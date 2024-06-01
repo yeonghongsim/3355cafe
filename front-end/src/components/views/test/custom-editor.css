@@ -1,0 +1,17 @@
+/* wysiwyg 작성 부분을 width100%로 제한시켜주는 부분 */
+.wrapper-class {
+    width: 100%;
+    border-radius: 0.5rem;
+}
+
+.editor-class {
+    width: 100%;
+    height: 40rem;
+}
+
+.rdw-editor-main {
+    font-size: 1.6rem;
+    padding-left: 3rem;
+    padding-top: 1rem;
+    border-radius: 0.5rem;
+}

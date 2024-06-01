@@ -104,3 +104,39 @@ app.get('/boardType', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+
+// --------------------------- test area
+// 데이터 저장 API 엔드포인트 추가
+app.post('/test/wysiwyg', async function (req, res) {
+    try {
+        console.log('Received a Wysiwyg request to save data from the front end.');
+        const { id, title, contentRaw, contentHTML, images } = req.body;
+
+        // 데이터베이스에 데이터 추가
+        await db.collection('test').insertOne({
+            id,
+            title,
+            contentRaw,
+            contentHTML,
+            images,
+        });
+
+        // 클라이언트에 성공 응답 전송
+        res.status(200).json({ message: 'Wysiwyg Data saved successfully' });
+    } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board page, get board category list
+app.get('/test/getWysiwyg', async function (req, res) {
+    try {
+        console.log('getWysiwyg processing start');
+
+        const result = await db.collection('test').find({}).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting getWysiwyg data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
