@@ -316,7 +316,7 @@ export default function BoardListBodyContainer({
                                             <BoardTypeWrapper>[ {board.boardType} ]</BoardTypeWrapper>
                                             <BoardWriterWrapper>{board.userId}</BoardWriterWrapper>
                                             <BoardTitleWrapper>{board.boardTitle}</BoardTitleWrapper>
-                                            <BoardViewsWrapper>{board.views}</BoardViewsWrapper>
+                                            <BoardViewsWrapper>{board.views.length}</BoardViewsWrapper>
                                             <BoardEmotionWrapper>
                                                 <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
                                                 <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>

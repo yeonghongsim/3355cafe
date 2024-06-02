@@ -142,8 +142,9 @@ const BoardContentSection = styled.section`
     width: 100%;
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
 `;
 const BoardLikeOrUnlikeSection = styled.section`
     width: 100%;
@@ -245,6 +246,11 @@ export default function BoardDetailPage() {
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
                                         {board.date.slice(0, 10)}
+                                    </HeaderText>
+                                </HeaderTextWrapper>
+                                <HeaderTextWrapper $borderLeft={true}>
+                                    <HeaderText $fontSize='1.4rem'>
+                                        조회수 {board.views.length}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                             </HeaderLayer>

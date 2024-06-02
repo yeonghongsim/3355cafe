@@ -183,7 +183,6 @@ const ErrorText = styled.p`
 
 export default function RegisterBoardPage() {
     const userInfo = useSelector((state) => (state.user.user));
-    console.log(userInfo);
     // select board type ref
     const boardTypeRef = useRef(null);
     // input title ref
@@ -257,7 +256,7 @@ export default function RegisterBoardPage() {
             return new Promise((resolve) => {
                 reader.onloadend = () => {
                     setUploadedImages(prevImages => [...prevImages, file.name]);
-                    resolve({ data: { link: reader.result } });
+                    resolve({ data: { link: reader.result, alignment: 'center' } });
                 };
             });
         } catch (error) {
@@ -279,7 +278,7 @@ export default function RegisterBoardPage() {
             userPrimeId: userInfo._id,
             userId: userInfo.userId,
             userName: userInfo.userName,
-            views: 0,
+            views: [],
             date: new Date(),
             likeList: [],
             unLikeList: [],
@@ -432,7 +431,7 @@ export default function RegisterBoardPage() {
                                             inputAccept: 'image/gif,image/jpeg,image/jpg,image/png,image/svg',
                                             defaultSize: {
                                                 height: 'auto',
-                                                width: '50%',
+                                                width: '60%',
                                             },
                                         },
                                     }}
