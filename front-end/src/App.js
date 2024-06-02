@@ -46,7 +46,7 @@ function App() {
           }
           <Route path='search' element={<BoardListBodyContainer $location='/board/search' />}></Route>
         </Route>
-        <Route path='/boardDetail' element={< BoardDetailPage />}></Route>
+        <Route path='/boardDetail/:id' element={< BoardDetailPage />}></Route>
         <Route path='/register'>
           <Route path='board' element={<RegisterBoardPage />}></Route>
         </Route>

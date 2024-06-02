@@ -104,9 +104,62 @@ app.get('/boardType', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// register board
+app.post('/register/board', async function (req, res) {
+    try {
+        console.log('Received a regiBoard request to save data from the front end.');
+        const { boardType,
+            boardTitle,
+            contentRaw,
+            contentHTML,
+            images,
+            userId,
+            userPrimeId,
+            userName,
+            views,
+            date,
+            likeList,
+            unLikeList, } = req.body;
+
+        // content: JSON.stringify(contentRaw),
+        // 데이터베이스에 데이터 추가
+        await db.collection('board').insertOne({
+            boardType,
+            boardTitle,
+            contentRaw,
+            contentHTML,
+            images,
+            userId,
+            userPrimeId,
+            userName,
+            views,
+            date,
+            likeList,
+            unLikeList,
+        });
+
+        // 클라이언트에 성공 응답 전송
+        res.status(200).json({ message: 'Wysiwyg Data saved successfully' });
+    } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board list get
+app.get('/boardList', async function (req, res) {
+    try {
+        console.log('getWysiwyg processing start');
+
+        const result = await db.collection('board').find({}).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting getWysiwyg data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // --------------------------- test area
-// 데이터 저장 API 엔드포인트 추가
+// wysiwyg post
 app.post('/test/wysiwyg', async function (req, res) {
     try {
         console.log('Received a Wysiwyg request to save data from the front end.');
@@ -128,7 +181,7 @@ app.post('/test/wysiwyg', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
-// board page, get board category list
+// wysiwyg get list
 app.get('/test/getWysiwyg', async function (req, res) {
     try {
         console.log('getWysiwyg processing start');

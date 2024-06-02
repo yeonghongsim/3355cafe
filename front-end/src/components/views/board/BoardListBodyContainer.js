@@ -1,7 +1,10 @@
 import styled from "styled-components"
 import { COLORS } from "../../../commons/styles/COLORS";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Spinner from "../../commons/hooks/Spinner";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -111,6 +114,14 @@ const BoardListContainer = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
+    gap: 0.1rem;
+`;
+const EmptyBoardContainer = styled.div`
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 `;
 const BoardPageLayer = styled.div`
     width: 100%;
@@ -119,7 +130,7 @@ const BoardPageLayer = styled.div`
     align-items: center;
     justify-content: center;
 `;
-const PageText = styled.p`
+const Text = styled.p`
     font-size: 1.6rem;
     font-weight: normal;
     color: black;
@@ -132,9 +143,7 @@ const BoardContainer = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
     border-top: 1px solid #d9d9d9;
-    ${(props) => props.$boardIndex === 10 ? `
-    border-bottom: 1px solid #d9d9d9;` : null
-    }
+    border-bottom: 1px solid #d9d9d9;
     box-sizing: border-box;
 `;
 const BoardTypeWrapper = styled.div`
@@ -143,7 +152,7 @@ const BoardTypeWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #eee;
+    // background-color: #eee;
     font-size: 1.4rem;
 `;
 const BoardWriterWrapper = styled.div`
@@ -152,7 +161,7 @@ const BoardWriterWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #d9d9d9;
+    // background-color: #d9d9d9;
     font-size: 1.4rem;
 `;
 const BoardTitleWrapper = styled.div`
@@ -161,7 +170,7 @@ const BoardTitleWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: #eee;
+    // background-color: #eee;
     font-size: 1.4rem;
     padding-left: 1rem;
     box-sizing: border-box;
@@ -172,36 +181,62 @@ const BoardViewsWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #d9d9d9;
+    // background-color: #d9d9d9;
     font-size: 1.4rem;
 `;
 const BoardEmotionWrapper = styled.div`
-    width: 15%;
+    width: 20%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #eee;
+    // background-color: #eee;
     font-size: 1.4rem;
 `;
+const ThumsImg = styled.img`
+    width: 2.5rem;
+    height: 2.5rem;
+    padding-right: 1rem;
+    flex-shirnk: 0;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+const BoardEmotionText = styled.p`
+    font-size: 1.4rem;
+    margin: 0;
+    ${(props) =>
+        props.$afterText && `
+        &::after {
+            content: '/';
+            margin-left: 2.5rem;
+            margin-right: 2.5rem;
+        }
+        `
+    }
+`;
 const BoardDateWrapper = styled.div`
-    width: 15%;
+    width: 10%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #d9d9d9;
+    // background-color: #d9d9d9;
     font-size: 1.4rem;
 `;
 
 export default function BoardListBodyContainer({
     $location
 }) {
-    console.log($location);
+    // console.log($location);
+    // page navigate
+    const navigate = useNavigate();
+    // 목록 조회 전까지의 로딩
+    const [isLoading, setIsLoading] = useState(true);
     // get userinfo in store
     const userInfo = useSelector((state) => state.user.user);
-    // imsi list for after get board list
-    const imsiBoardList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    // board list from fetch get
+    let [boardList, setBoardList] = useState([]);
     // search input ref
     const searchInputRef = useRef(null);
     // search input ref get value
@@ -211,14 +246,33 @@ export default function BoardListBodyContainer({
         // window.location.href = '/board/search';
     };
     // click board, move to board detail
-    const handleClickBoard = () => {
-        window.location.href = '/boardDetail';
+    const handleClickBoard = (board) => {
+        navigate(`/boardDetail/${board._id}`, { state: { board } });
     };
     // click btn, move to register board
     const handleClickResisterBoardBtn = () => {
-        console.log(userInfo);
-        window.location.href = '/register/board';
+        // console.log(userInfo);
+        navigate('/register/board');
     };
+    // fetching board list
+    useEffect(() => {
+        const fetchItems = async () => {
+            try {
+                const fullURL = `http://localhost:8080/boardList`;
+                const response = await axios.get(fullURL);
+                const result = await response.data;
+                setBoardList(result);
+                setIsLoading(false);
+                // console.log(result);
+            } catch (error) {
+                console.error('Error getting itemType data:', error);
+                throw error;
+            }
+        };
+        // fetchUserItems를 의존성 배열에 추가
+        fetchItems();
+    }, []);
+    console.log(boardList[0])
 
     return (
         <Wrapper>
@@ -244,27 +298,45 @@ export default function BoardListBodyContainer({
                 </SearchBarContainer>
             </RegisterBoardWithSearchBarSection>
             <BoardListSection>
-                <BoardListContainer>
-                    {
-                        imsiBoardList.map((board, idx) => (
-                            <BoardContainer
-                                key={idx}
-                                $boardIndex={idx + 1}
-                                onClick={handleClickBoard}>
-                                <BoardTypeWrapper>글타입</BoardTypeWrapper>
-                                <BoardWriterWrapper>작성자</BoardWriterWrapper>
-                                <BoardTitleWrapper>10000000091000000009100000000910000000091000000009</BoardTitleWrapper>
-                                <BoardViewsWrapper>조회수</BoardViewsWrapper>
-                                <BoardEmotionWrapper>좋아요/싫어요</BoardEmotionWrapper>
-                                <BoardDateWrapper>작성일</BoardDateWrapper>
-                            </BoardContainer>
-                        ))
-                    }
-                    <BoardPageLayer>
-                        <PageText>1</PageText>
-                    </BoardPageLayer>
-                </BoardListContainer>
+                {
+                    isLoading ?
+                        <Spinner></Spinner> :
+                        <BoardListContainer>
+                            {
+                                boardList.length === 0 ?
+                                    <EmptyBoardContainer>
+                                        <Text>게시글이 없습니다.</Text>
+                                    </EmptyBoardContainer>
+                                    :
+                                    boardList?.map((board, idx) => (
+                                        <BoardContainer
+                                            key={idx}
+                                            $boardIndex={idx + 1}
+                                            onClick={() => handleClickBoard(board)}>
+                                            <BoardTypeWrapper>[ {board.boardType} ]</BoardTypeWrapper>
+                                            <BoardWriterWrapper>{board.userId}</BoardWriterWrapper>
+                                            <BoardTitleWrapper>{board.boardTitle}</BoardTitleWrapper>
+                                            <BoardViewsWrapper>{board.views}</BoardViewsWrapper>
+                                            <BoardEmotionWrapper>
+                                                <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
+                                                <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>
+                                                <ThumsImg src="/image/thumbs-down.svg"></ThumsImg>
+                                                <BoardEmotionText $afterText={false}>{board.unLikeList.length}</BoardEmotionText>
+                                            </BoardEmotionWrapper>
+                                            <BoardDateWrapper>{board.date.slice(0, 10)}</BoardDateWrapper>
+                                        </BoardContainer>
+
+                                    ))
+                            }
+                            {
+                                boardList.length !== 0 ?
+                                    < BoardPageLayer >
+                                        <Text>page number</Text>
+                                    </BoardPageLayer> : null
+                            }
+                        </BoardListContainer>
+                }
             </BoardListSection>
-        </Wrapper>
+        </Wrapper >
     )
 }

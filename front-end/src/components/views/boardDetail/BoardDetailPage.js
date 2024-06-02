@@ -2,6 +2,7 @@ import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useState } from "react";
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -67,6 +68,23 @@ const BarImage = styled.img`
     width: 50%;
     height: 50%;
 `;
+const BackTextContainer = styled.div`
+    width: 100%;
+    height: 4rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+`;
+const BackText = styled.p`
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: black;
+    margin: 0;
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
+`;
 const BodySection = styled.section`
     width: 100%;
     border-top: 0.1rem solid #d9d9d9;
@@ -78,7 +96,7 @@ const BoardInfoSection = styled.section`
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    margin-top: 1rem;
+    // margin-top: 1rem;
     padding: 1rem;
     box-sizing: border-box;
     border-radius: 0.5rem;
@@ -122,7 +140,6 @@ const HeaderText = styled.p`
 `;
 const BoardContentSection = styled.section`
     width: 100%;
-    background-color: #eee;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -134,7 +151,31 @@ const BoardLikeOrUnlikeSection = styled.section`
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #d9d9d9;
+`;
+const LikeUnlikeText = styled.p`
+    font-size: 1.6rem;
+    font-weight: normal;
+    margin: 0;
+    margin-left: 1.5rem;
+    color: black;
+    ${(props) =>
+        props.$afterText && `
+        &::after {
+            content: '/';
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+        `
+    }
+`;
+const ThumsImg = styled.img`
+    width: 3rem;
+    height: 3rem;
+    padding-right: 1rem;
+    flex-shirnk: 0;
+    &:hover {
+        cursor: pointer;
+    }
 `;
 const BoardReplySection = styled.section`
     width: 100%;
@@ -143,6 +184,10 @@ const BoardReplySection = styled.section`
 `;
 
 export default function BoardDetailPage() {
+    const navigate = useNavigate();
+    const location = useLocation();
+    // 받아온 데이터
+    const board = location.state?.board;
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close
@@ -154,6 +199,9 @@ export default function BoardDetailPage() {
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
     }, []);
+    const handlePageBack = () => {
+        navigate('/board');
+    };
 
     return (
         <Wrapper>
@@ -180,6 +228,9 @@ export default function BoardDetailPage() {
             </HeaderSection>
             <BodySection>
                 <SmallWrapper>
+                    <BackTextContainer>
+                        <BackText onClick={() => handlePageBack()}>뒤로 가기</BackText>
+                    </BackTextContainer>
                     <BoardInfoSection>
                         <BoardHeaderSection>
                             <HeaderLayer
@@ -188,12 +239,12 @@ export default function BoardDetailPage() {
                             >
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
-                                        작성자 ID
+                                        {board.userId}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
-                                        작성일 new Date
+                                        {board.date.slice(0, 10)}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                             </HeaderLayer>
@@ -203,16 +254,22 @@ export default function BoardDetailPage() {
                             >
                                 <HeaderTextWrapper $borderLeft={false}>
                                     <HeaderText $fontSize='1.8rem'>
-                                        12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455
+                                        {board.boardTitle}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                             </HeaderLayer>
                         </BoardHeaderSection>
-                        <BoardContentSection>
-                            게시글 내용 과 이미지 리스트들
+                        <BoardContentSection dangerouslySetInnerHTML={{ __html: board.contentHTML }}>
                         </BoardContentSection>
                         <BoardLikeOrUnlikeSection>
-                            좋아요 / 싫어요 공간
+                            <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
+                            <LikeUnlikeText $afterText={true}>
+                                {board.likeList.length}
+                            </LikeUnlikeText>
+                            <ThumsImg src="/image/thumbs-down.svg"></ThumsImg>
+                            <LikeUnlikeText $afterText={false}>
+                                {board.unLikeList.length}
+                            </LikeUnlikeText>
                         </BoardLikeOrUnlikeSection>
                     </BoardInfoSection>
                     <BoardReplySection>

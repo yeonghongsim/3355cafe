@@ -3,6 +3,13 @@ import LOGO from "../../../commons/logo/LOGO";
 import { useRef, useState } from "react";
 import { COLORS } from "../../../../commons/styles/COLORS";
 import RegiBoardSelect01 from "../../../commons/select/RegiBoardSelect01";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import { EditorState, convertToRaw } from "draft-js";
+import { Editor } from "react-draft-wysiwyg";
+import draftToHtml from 'draftjs-to-html';
+import './custom-editor.css';
+import ResiBoardConfirmModal from "../../../commons/modal/ResiBoardConfirmModal";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -21,7 +28,7 @@ const SmallWrapper = styled.div`
 const HeaderSection = styled.section`
     width: 100%;
     height: 12vh;
-    border-bottom: 0.1rem solid black;
+    border-bottom: 0.1rem solid darkgray;
     box-sizing: border-box;
 `;
 const HeaderContainer = styled.div`
@@ -116,6 +123,22 @@ const Input = styled.input`
         outline: none;
     }
 `;
+const WysiwygContainer = styled.div`
+    width: 100%;
+    background-color: white;
+    border: 0.1rem solid black;
+    border-radius: 0.5rem;
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0.1rem;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow-y: auto;
+`;
 const BtnContainer = styled.div`
     width: 100%;
     height: 4rem;
@@ -139,27 +162,187 @@ const RegiBtn = styled.div`
         cursor: pointer;
     }
 `;
+const ErrorTextContainer = styled.div`
+    width: 100%;
+    // height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+`;
+const ErrorText = styled.p`
+    font-size: 1.4rem;
+    font-weight: normal;
+    color: red;
+    margin: 0;
+    padding-right: 0.35rem;
+    &::after {
+        // content: ",";
+        content: ${({ $sequence, $length }) => ($sequence < $length - 1 ? "','" : '""')};
+    }
+`;
 
 export default function RegisterBoardPage() {
+    const userInfo = useSelector((state) => (state.user.user));
+    console.log(userInfo);
     // select board type ref
     const boardTypeRef = useRef(null);
     // input title ref
     const titleInputRef = useRef(null);
     // input value length control
     const [inputValue, setInputValue] = useState("");
+    // data validation 후 이상이 생겼을 때 사용할 state
+    let [errorList, setErrorList] = useState([]);
+    let [isOnErrBoardType, setIsOnErrBoardType] = useState(false);
+    let [isOnErrBoardTitle, setIsOnErrBoardTitle] = useState(false);
+    let [isOnErrBoardContent, setIsOnErrBoardContent] = useState(false);
+    let isOnAnyErr = isOnErrBoardType || isOnErrBoardTitle || isOnErrBoardContent;
+    // confirm modal state
+    let [isOnConfirmModal, setIsOnConfirmModal] = useState(false);
+    // prepared data
+    let [prepareDate, setPrepareDate] = useState({});
     // input change handler to limit length
     const handleInputChange = (e) => {
-        if (e.target.value.length <= 45) {
+        if (e.target.value.length <= 40) {
             setInputValue(e.target.value);
+        }
+    };
+    // wysiwyg 관련 내용들
+    const [editorState, setEditorState] = useState(() =>
+        EditorState.createEmpty()
+    );
+    // 업로드한 이미지를 알아보기 위한 state
+    const [uploadedImages, setUploadedImages] = useState([]);
+    // image size 관련 오류로 인해 사이즈 조정 코드
+    const resizeImage = (file, maxWidth, maxHeight) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const image = new Image();
+                image.src = event.target.result;
+                image.onload = () => {
+                    let width = image.width;
+                    let height = image.height;
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height *= maxWidth / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width *= maxHeight / height;
+                            height = maxHeight;
+                        }
+                    }
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(image, 0, 0, width, height);
+                    canvas.toBlob((blob) => {
+                        resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+                    }, 'image/jpeg');
+                };
+                image.onerror = reject;
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    };
+    // wysiwyg의 toolbar에서 image 버튼을 클릭했을 때 사용하는 코드
+    const handleImageUploadCallback = async (file) => {
+        try {
+            const resizedImage = await resizeImage(file, 800, 600);
+            const reader = new FileReader();
+            reader.readAsDataURL(resizedImage);
+            return new Promise((resolve) => {
+                reader.onloadend = () => {
+                    setUploadedImages(prevImages => [...prevImages, file.name]);
+                    resolve({ data: { link: reader.result } });
+                };
+            });
+        } catch (error) {
+            console.error('이미지 축소 중 오류 발생:', error);
+            return Promise.reject(error);
         }
     };
     // resi btn click
     const handleRegiBtnClick = () => {
+        const contentState = editorState.getCurrentContent();
+        const contentRaw = convertToRaw(contentState);
+        const contentHTML = draftToHtml(contentRaw);
         const data = {
             boardType: boardTypeRef.current.value,
             boardTitle: inputValue,
+            contentRaw: JSON.stringify(contentRaw),
+            contentHTML: contentHTML,
+            images: uploadedImages,
+            userPrimeId: userInfo._id,
+            userId: userInfo.userId,
+            userName: userInfo.userName,
+            views: 0,
+            date: new Date(),
+            likeList: [],
+            unLikeList: [],
+        };
+        // 데이터 유효성 검사하기
+        const errors = [];
+        // 1. 글 타입 확인하지 않았을 때
+        const isTypeError = data.boardType === '';
+        if (isTypeError) {
+            setIsOnErrBoardType(true);
+            if (!errors.includes('카테고리')) {
+                errors.push('카테고리');
+                setErrorList(errors);
+            }
+        } else {
+            setIsOnErrBoardType(false);
+            if (errors.includes('카테고리')) {
+                const copy = errors.filter(error => error !== '카테고리');
+                setErrorList(copy);
+            }
         }
-        console.log(data);
+        // 2. 글 제목을 입력하지 않았을 때
+        const isTitleError = data.boardTitle.length === 0
+        if (isTitleError) {
+            setIsOnErrBoardTitle(true);
+            if (!errors.includes('제목')) {
+                errors.push('제목');
+                setErrorList(errors);
+            }
+        } else {
+            setIsOnErrBoardTitle(false);
+            if (errors.includes('제목')) {
+                const copy = errors.filter(error => error !== '제목');
+                setErrorList(copy);
+            }
+        }
+        // 3. 글 내용을 입력하지 않았을 때
+        // 내용부가 비었을때의 contentHTML의 내용 <p></p>
+        const isContentEmpty = !contentRaw.blocks.some(block => block.text.trim() !== '');
+        if (isContentEmpty) {
+            setIsOnErrBoardContent(true);
+            if (!errors.includes('내용')) {
+                errors.push('내용');
+                setErrorList(errors);
+            }
+        } else {
+            setIsOnErrBoardContent(false);
+            if (errors.includes('내용')) {
+                const copy = errors.filter(error => error !== '내용');
+                setErrorList(copy);
+            }
+        };
+        if (isTypeError || isTitleError || isContentEmpty) {
+            // console.log('오류 발생');
+            setIsOnConfirmModal(false);
+            return;
+        } else {
+            setPrepareDate(data);
+            setIsOnConfirmModal(true);
+        }
+    }
+    const handleModalClose = () => {
+        setIsOnConfirmModal(false);
     };
 
     return (
@@ -175,6 +358,25 @@ export default function RegisterBoardPage() {
                 <SmallWrapper>
                     <Form>
                         <Layer>
+                            {
+                                isOnAnyErr &&
+                                <ErrorTextContainer>
+                                    {
+                                        errorList.map((error, i) =>
+                                            <ErrorText
+                                                key={i}
+                                                $sequence={i}
+                                                $length={errorList.length}
+                                            >{error}</ErrorText>
+                                        )
+                                    }
+                                    <ErrorText>
+                                        을(를) 확인해 주세요.
+                                    </ErrorText>
+                                </ErrorTextContainer>
+                            }
+                        </Layer>
+                        <Layer>
                             <TypeNTitleContainer>
                                 <BoardTypeContainer>
                                     <RegiBoardSelect01
@@ -188,7 +390,7 @@ export default function RegisterBoardPage() {
                                     <TitleInputContainer>
                                         <Input
                                             ref={titleInputRef}
-                                            placeholder="45자 이내로 작성해주세요."
+                                            placeholder="40자 이내로 작성해주세요."
                                             value={inputValue}
                                             onChange={handleInputChange}
                                         ></Input>
@@ -196,14 +398,58 @@ export default function RegisterBoardPage() {
                                 </BoardTitleContainer>
                             </TypeNTitleContainer>
                         </Layer>
-                        <Layer>내용 / 길이 1000자 이내</Layer>
-                        <Layer>이미지 / 리스트 형식</Layer>
+                        <Layer>
+                            <WysiwygContainer>
+                                <Editor
+                                    editorState={editorState}
+                                    wrapperClassName="wrapper-class"
+                                    toolbarClassName="toolbar-class"
+                                    editorClassName="editor-class"
+                                    onEditorStateChange={setEditorState}
+                                    placeholder="내용을 입력하세요."
+                                    localization={{
+                                        locale: 'ko',
+                                    }}
+                                    toolbar={{
+                                        options: [
+                                            'image',
+                                            'inline',
+                                            'blockType',
+                                            'fontSize',
+                                            // 'list',
+                                            'textAlign',
+                                            'colorPicker',
+                                            // 'link',
+                                            // 'embedded',
+                                            'emoji',
+                                            'remove',
+                                            'history'
+                                        ],
+                                        image: {
+                                            uploadCallback: handleImageUploadCallback,
+                                            alt: { present: true, mandatory: false },
+                                            previewImage: true,
+                                            inputAccept: 'image/gif,image/jpeg,image/jpg,image/png,image/svg',
+                                            defaultSize: {
+                                                height: 'auto',
+                                                width: '50%',
+                                            },
+                                        },
+                                    }}
+                                />
+                            </WysiwygContainer>
+                        </Layer>
                         <Layer>
                             <BtnContainer>
                                 <RegiBtn onClick={handleRegiBtnClick}>
                                     등록 하기
                                 </RegiBtn>
                             </BtnContainer>
+                            <ResiBoardConfirmModal
+                                isOn={isOnConfirmModal}
+                                handleModalClose={handleModalClose}
+                                prepareDate={prepareDate}
+                            ></ResiBoardConfirmModal>
                         </Layer>
                     </Form>
                 </SmallWrapper>
