@@ -5,7 +5,7 @@ import { useCallback, useState } from "react";
 import { useSelector } from "react-redux";
 import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 import { Outlet, useLocation } from "react-router-dom";
-import BoardBodyContainer from "./BoardBodyContainer";
+import BoardListBodyContainer from "./BoardListBodyContainer";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -105,7 +105,7 @@ const BodySection = styled.section`
     height: 80vh;
 `;
 
-export default function BoardPage() {
+export default function BoardListPage() {
     const location = useLocation();
     // get boardTypeList in store
     const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
@@ -168,7 +168,7 @@ export default function BoardPage() {
                 <SmallWrapper>
                     {
                         location.pathname === '/board'
-                            ? <BoardBodyContainer $location={location.pathname}></BoardBodyContainer> :
+                            ? <BoardListBodyContainer $location={location.pathname}></BoardListBodyContainer> :
                             <Outlet></Outlet>
                     }
                 </SmallWrapper>

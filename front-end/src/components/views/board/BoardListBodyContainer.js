@@ -194,7 +194,7 @@ const BoardDateWrapper = styled.div`
     font-size: 1.4rem;
 `;
 
-export default function BoardBodyContainer({
+export default function BoardListBodyContainer({
     $location
 }) {
     console.log($location);
@@ -253,7 +253,7 @@ export default function BoardBodyContainer({
                                 onClick={handleClickBoard}>
                                 <BoardTypeWrapper>글타입</BoardTypeWrapper>
                                 <BoardWriterWrapper>작성자</BoardWriterWrapper>
-                                <BoardTitleWrapper>100000000910000000091000000009100</BoardTitleWrapper>
+                                <BoardTitleWrapper>10000000091000000009100000000910000000091000000009</BoardTitleWrapper>
                                 <BoardViewsWrapper>조회수</BoardViewsWrapper>
                                 <BoardEmotionWrapper>좋아요/싫어요</BoardEmotionWrapper>
                                 <BoardDateWrapper>작성일</BoardDateWrapper>

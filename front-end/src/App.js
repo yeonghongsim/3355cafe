@@ -5,8 +5,8 @@ import { Route, Routes } from 'react-router-dom';
 import HomePage from './components/views/home/HomePage';
 import SignUpPage from './components/views/signup/SignUpPage';
 import LoginPage from './components/views/login/LoginPage';
-import BoardPage from './components/views/board/BoardPage';
-import BoardBodyContainer from './components/views/board/BoardBodyContainer';
+import BoardListPage from './components/views/board/BoardListPage';
+import BoardListBodyContainer from './components/views/board/BoardListBodyContainer';
 import BoardDetailPage from './components/views/boardDetail/BoardDetailPage';
 import RegisterBoardPage from './components/views/register/board/RegisterBoardPage';
 import Test1 from './components/views/test/Test1';
@@ -38,13 +38,13 @@ function App() {
         <Route path='/' element={< HomePage />}></Route>
         <Route path='/signUp' element={< SignUpPage />}></Route>
         <Route path='/login' element={< LoginPage />}></Route>
-        <Route path='/board' element={< BoardPage />}>
+        <Route path='/board' element={< BoardListPage />}>
           {
             boardTypeList.map((boardType, idx) => (
-              <Route path={boardType.url} element={<BoardBodyContainer $location={boardType.url} />} key={idx} />
+              <Route path={boardType.url} element={<BoardListBodyContainer $location={boardType.url} />} key={idx} />
             ))
           }
-          <Route path='search' element={<BoardBodyContainer $location='/board/search' />}></Route>
+          <Route path='search' element={<BoardListBodyContainer $location='/board/search' />}></Route>
         </Route>
         <Route path='/boardDetail' element={< BoardDetailPage />}></Route>
         <Route path='/register'>
