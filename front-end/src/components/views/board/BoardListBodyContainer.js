@@ -245,13 +245,53 @@ export default function BoardListBodyContainer({
         console.log(searchData);
         // window.location.href = '/board/search';
     };
-    // click board, move to board detail
-    const handleClickBoard = (board) => {
-        navigate(`/boardDetail/${board._id}`, { state: { board } });
+    // click board, update board.views
+    // put userId in board.views
+    // fetching data and page move with state n updated data
+    const handleClickBoard = async (board) => {
+        // console.log(board);
+        const beforeViews = board.views;
+        if (!beforeViews.includes(userInfo._id)) {
+            beforeViews.push(userInfo._id);
+        }
+        const data = {
+            boardId: board.boardId,
+            boardType: board.boardType,
+            boardTitle: board.boardTitle,
+            contentRaw: board.contentRaw,
+            contentHTML: board.contentHTML,
+            date: board.date,
+            images: board.images,
+            likeList: board.likeList,
+            unLikeList: board.unLikeList,
+            userPrimeId: board.userPrimeId,
+            userId: board.userId,
+            userName: board.userName,
+            views: beforeViews,
+        }
+        console.log(data);
+        try {
+            const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (response.ok) {
+                console.log('Success to update data')
+                // navigate('/board');
+            } else {
+                console.log('Failed to update data');
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        }
     };
     // click btn, move to register board
-    const handleClickResisterBoardBtn = () => {
-        // console.log(userInfo);
+    const handleClickResisterBoardBtn = (board) => {
         navigate('/register/board');
     };
     // fetching board list
@@ -272,7 +312,6 @@ export default function BoardListBodyContainer({
         // fetchUserItems를 의존성 배열에 추가
         fetchItems();
     }, []);
-    console.log(boardList[0])
 
     return (
         <Wrapper>

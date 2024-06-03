@@ -11,6 +11,7 @@ import './custom-editor.css';
 import ResiBoardConfirmModal from "../../../commons/modal/ResiBoardConfirmModal";
 import { useSelector } from "react-redux";
 
+
 const Wrapper = styled.div`
     width: 100%;
     height: 100%;
@@ -336,6 +337,7 @@ export default function RegisterBoardPage() {
             setIsOnConfirmModal(false);
             return;
         } else {
+            console.log(data);
             setPrepareDate(data);
             setIsOnConfirmModal(true);
         }

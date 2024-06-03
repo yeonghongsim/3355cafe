@@ -108,7 +108,8 @@ app.get('/boardType', async function (req, res) {
 app.post('/register/board', async function (req, res) {
     try {
         console.log('Received a regiBoard request to save data from the front end.');
-        const { boardType,
+        const {
+            boardType,
             boardTitle,
             contentRaw,
             contentHTML,
@@ -154,6 +155,45 @@ app.get('/boardList', async function (req, res) {
         res.status(200).json(result);
     } catch (error) {
         console.error('Error getting getWysiwyg data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board update countViews
+app.post('/update/board/addUseridInViews', async function (req, res) {
+    console.log('start update board');
+    try {
+        const data = {
+            // boardId: boardId,
+            // boardType: req.body.boardType,
+            // boardTitle: req.body.boardTitle,
+            // contentHTML: req.body.contentHTML,
+            // contentRaw: req.body.contentRaw,
+            // date: req.body.date,
+            // images: req.body.images,
+            // likeList: req.body.likeList,
+            // unLikeList: req.body.unLikeList,
+            // userPrimeId: req.body.userPrimeId,
+            // userId: req.body.userId,
+            // userName: req.body.userName,
+            views: req.body.views,
+        };
+        // 여기에서 데이터베이스 업데이트 로직을 추가
+        const result = await db.collection('board').updateOne(
+            { _id: new ObjectId() },
+            { $set: data }
+        );
+
+        // 업데이트 결과를 확인하고 클라이언트에게 전달
+        if (result.modifiedCount === 1) {
+            console.log('Successfully updated board:', result);
+            res.status(200).json({ message: 'Successfully updated board', updatedBoard: data });
+        } else {
+            console.log('Board not found or not updated:', result);
+            res.status(404).json({ message: 'Board not found or not updated' });
+        }
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
