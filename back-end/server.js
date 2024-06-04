@@ -109,6 +109,7 @@ app.post('/register/board', async function (req, res) {
     try {
         console.log('Received a regiBoard request to save data from the front end.');
         const {
+            boardId,
             boardType,
             boardTitle,
             contentRaw,
@@ -121,10 +122,11 @@ app.post('/register/board', async function (req, res) {
             date,
             likeList,
             unLikeList, } = req.body;
-
+        console.log(req.body);
         // content: JSON.stringify(contentRaw),
         // 데이터베이스에 데이터 추가
         await db.collection('board').insertOne({
+            boardId,
             boardType,
             boardTitle,
             contentRaw,
@@ -162,35 +164,23 @@ app.get('/boardList', async function (req, res) {
 app.post('/update/board/addUseridInViews', async function (req, res) {
     console.log('start update board');
     try {
+        console.log(req.body);
+        const boardId = req.body.boardId;
         const data = {
-            // boardId: boardId,
-            // boardType: req.body.boardType,
-            // boardTitle: req.body.boardTitle,
-            // contentHTML: req.body.contentHTML,
-            // contentRaw: req.body.contentRaw,
-            // date: req.body.date,
-            // images: req.body.images,
-            // likeList: req.body.likeList,
-            // unLikeList: req.body.unLikeList,
-            // userPrimeId: req.body.userPrimeId,
-            // userId: req.body.userId,
-            // userName: req.body.userName,
-            views: req.body.views,
-        };
-        // 여기에서 데이터베이스 업데이트 로직을 추가
-        const result = await db.collection('board').updateOne(
-            { _id: new ObjectId() },
-            { $set: data }
-        );
-
-        // 업데이트 결과를 확인하고 클라이언트에게 전달
-        if (result.modifiedCount === 1) {
-            console.log('Successfully updated board:', result);
-            res.status(200).json({ message: 'Successfully updated board', updatedBoard: data });
-        } else {
-            console.log('Board not found or not updated:', result);
-            res.status(404).json({ message: 'Board not found or not updated' });
+            views: req.body.views
         }
+        const result = await db.collection('board').updateOne(
+            { boardId: boardId },
+            { $set: data }
+        )
+        console.log('Matched ' + result.matchedCount + ' document(s) and modified ' + result.modifiedCount + ' document(s)');
+        // return board object
+        // 게시글 정보 재전달
+        console.log('start to return updated board to front-end.');
+        const board = await db.collection('board').findOne(
+            { boardId: boardId }
+        )
+        res.status(200).json({ message: 'Success', board });
     }
     catch (error) {
         console.error('Error processing updateBoard request:', error);
@@ -198,7 +188,7 @@ app.post('/update/board/addUseridInViews', async function (req, res) {
     }
 });
 
-// --------------------------- test area
+// --- test6 관련
 // wysiwyg post
 app.post('/test/wysiwyg', async function (req, res) {
     try {

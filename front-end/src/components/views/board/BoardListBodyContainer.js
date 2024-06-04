@@ -249,27 +249,11 @@ export default function BoardListBodyContainer({
     // put userId in board.views
     // fetching data and page move with state n updated data
     const handleClickBoard = async (board) => {
-        // console.log(board);
-        const beforeViews = board.views;
-        if (!beforeViews.includes(userInfo._id)) {
-            beforeViews.push(userInfo._id);
+        // navigate(`/boardDetail/${board._id}`, { state: { board } });
+        if (!board.views.includes(userInfo._id)) {
+            board.views.push(userInfo._id);
         }
-        const data = {
-            boardId: board.boardId,
-            boardType: board.boardType,
-            boardTitle: board.boardTitle,
-            contentRaw: board.contentRaw,
-            contentHTML: board.contentHTML,
-            date: board.date,
-            images: board.images,
-            likeList: board.likeList,
-            unLikeList: board.unLikeList,
-            userPrimeId: board.userPrimeId,
-            userId: board.userId,
-            userName: board.userName,
-            views: beforeViews,
-        }
-        console.log(data);
+        console.log(board);
         try {
             const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
                 method: "POST",
@@ -277,12 +261,14 @@ export default function BoardListBodyContainer({
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify(board),
             });
 
             if (response.ok) {
-                console.log('Success to update data')
-                // navigate('/board');
+                const data = await response.json();
+                const board = data.board;
+                // console.log(data.board);
+                navigate(`/boardDetail/${data.board._id}`, { state: { board } });
             } else {
                 console.log('Failed to update data');
             }

@@ -270,7 +270,10 @@ export default function RegisterBoardPage() {
         const contentState = editorState.getCurrentContent();
         const contentRaw = convertToRaw(contentState);
         const contentHTML = draftToHtml(contentRaw);
+        const randomString1 = Math.random().toString(36).substring(2, 14);
+        const randomString2 = Math.random().toString(36).substring(2, 14);
         const data = {
+            boardId: randomString1 + '-' + randomString2,
             boardType: boardTypeRef.current.value,
             boardTitle: inputValue,
             contentRaw: JSON.stringify(contentRaw),
@@ -337,7 +340,7 @@ export default function RegisterBoardPage() {
             setIsOnConfirmModal(false);
             return;
         } else {
-            console.log(data);
+            // console.log(data);
             setPrepareDate(data);
             setIsOnConfirmModal(true);
         }

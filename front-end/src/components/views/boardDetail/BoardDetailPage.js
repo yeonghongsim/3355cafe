@@ -188,7 +188,7 @@ export default function BoardDetailPage() {
     const navigate = useNavigate();
     const location = useLocation();
     // 받아온 데이터
-    const board = location.state?.board;
+    let board = location.state?.board;
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close
@@ -240,17 +240,17 @@ export default function BoardDetailPage() {
                             >
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
-                                        {board.userId}
+                                        {board?.userId}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
-                                        {board.date.slice(0, 10)}
+                                        {board?.date.slice(0, 10)}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                                 <HeaderTextWrapper $borderLeft={true}>
                                     <HeaderText $fontSize='1.4rem'>
-                                        조회수 {board.views.length}
+                                        조회수 {board?.views.length}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                             </HeaderLayer>
@@ -260,21 +260,21 @@ export default function BoardDetailPage() {
                             >
                                 <HeaderTextWrapper $borderLeft={false}>
                                     <HeaderText $fontSize='1.8rem'>
-                                        {board.boardTitle}
+                                        {board?.boardTitle}
                                     </HeaderText>
                                 </HeaderTextWrapper>
                             </HeaderLayer>
                         </BoardHeaderSection>
-                        <BoardContentSection dangerouslySetInnerHTML={{ __html: board.contentHTML }}>
+                        <BoardContentSection dangerouslySetInnerHTML={{ __html: board?.contentHTML }}>
                         </BoardContentSection>
                         <BoardLikeOrUnlikeSection>
                             <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
                             <LikeUnlikeText $afterText={true}>
-                                {board.likeList.length}
+                                {board?.likeList.length}
                             </LikeUnlikeText>
                             <ThumsImg src="/image/thumbs-down.svg"></ThumsImg>
                             <LikeUnlikeText $afterText={false}>
-                                {board.unLikeList.length}
+                                {board?.unLikeList.length}
                             </LikeUnlikeText>
                         </BoardLikeOrUnlikeSection>
                     </BoardInfoSection>
