@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../../commons/hooks/Spinner";
+import UnLoginAlertModal from "../../commons/modal/UnLoginAlertModal";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -198,9 +199,6 @@ const ThumsImg = styled.img`
     height: 2.5rem;
     padding-right: 1rem;
     flex-shirnk: 0;
-    &:hover {
-        cursor: pointer;
-    }
 `;
 const BoardEmotionText = styled.p`
     font-size: 1.4rem;
@@ -233,6 +231,11 @@ export default function BoardListBodyContainer({
     const navigate = useNavigate();
     // 목록 조회 전까지의 로딩
     const [isLoading, setIsLoading] = useState(true);
+    // 알람 모달 state
+    let [isOnAlertModal, setIsOnAlertModal] = useState(false);
+    const handleCloseAlertModal = () => {
+        setIsOnAlertModal(false);
+    };
     // get userinfo in store
     const userInfo = useSelector((state) => state.user.user);
     // board list from fetch get
@@ -248,12 +251,17 @@ export default function BoardListBodyContainer({
     // click board, update board.views
     // put userId in board.views
     // fetching data and page move with state n updated data
-    const handleClickBoard = async (board) => {
-        // navigate(`/boardDetail/${board._id}`, { state: { board } });
+    const handleClickBoard = (board) => {
+        if (userInfo === null) {
+            setIsOnAlertModal(true);
+        } else {
+            handleUpdateBoardViews(board)
+        }
+    };
+    const handleUpdateBoardViews = async (board) => {
         if (!board.views.includes(userInfo._id)) {
             board.views.push(userInfo._id);
         }
-        console.log(board);
         try {
             const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
                 method: "POST",
@@ -277,7 +285,7 @@ export default function BoardListBodyContainer({
         }
     };
     // click btn, move to register board
-    const handleClickResisterBoardBtn = (board) => {
+    const handleClickResisterBoardBtn = () => {
         navigate('/register/board');
     };
     // fetching board list
@@ -362,6 +370,10 @@ export default function BoardListBodyContainer({
                         </BoardListContainer>
                 }
             </BoardListSection>
+            <UnLoginAlertModal
+                isOn={isOnAlertModal}
+                handleCloseModal={handleCloseAlertModal}
+            ></UnLoginAlertModal>
         </Wrapper >
     )
 }

@@ -187,6 +187,46 @@ app.post('/update/board/addUseridInViews', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// board likelist put userId
+app.post('/update/board/toggleLikeList', async function (req, res) {
+    console.log('start update board');
+    try {
+        const boardId = req.body.boardId;
+        const data = {
+            likeList: req.body.likeList
+        }
+        const result = await db.collection('board').updateOne(
+            { boardId: boardId },
+            { $set: data }
+        )
+        console.log('Matched ' + result.matchedCount + ' document(s) and modified ' + result.modifiedCount + ' document(s)');
+        res.status(200).json({ message: 'Success' });
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board unlikelist put userId
+app.post('/update/board/toggleUnlikeList', async function (req, res) {
+    console.log('start update board');
+    try {
+        const boardId = req.body.boardId;
+        const data = {
+            unLikeList: req.body.unLikeList
+        }
+        const result = await db.collection('board').updateOne(
+            { boardId: boardId },
+            { $set: data }
+        )
+        console.log('Matched ' + result.matchedCount + ' document(s) and modified ' + result.modifiedCount + ' document(s)');
+        res.status(200).json({ message: 'Success' });
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // --- test6 관련
 // wysiwyg post

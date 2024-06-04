@@ -178,7 +178,7 @@ export default function BarModal({
                         <>
                             <ContentContainer>
                                 <ContentText $afterText="true">회원 정보</ContentText>
-                                <ContentText $afterText="false">게시글(n)</ContentText>
+                                <ContentText $afterText="false">내 게시글(n)</ContentText>
                             </ContentContainer>
                             <ButtonContainer>
                                 <LogoutBtn

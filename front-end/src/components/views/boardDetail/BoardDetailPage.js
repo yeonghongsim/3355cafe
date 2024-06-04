@@ -3,6 +3,7 @@ import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -187,6 +188,7 @@ const BoardReplySection = styled.section`
 export default function BoardDetailPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    const userInfo = useSelector((state) => state.user.user);
     // 받아온 데이터
     let board = location.state?.board;
     // bar modal section
@@ -202,6 +204,100 @@ export default function BoardDetailPage() {
     }, []);
     const handlePageBack = () => {
         navigate('/board');
+    };
+    let [boardLikeList, setBoardLikeList] = useState(board.likeList);
+    let [boardUnlikeList, setBoardUnlikeList] = useState(board.unLikeList);
+    const handleLikeClick = async (board) => {
+        console.log('like btn click');
+        let copy;
+        if (!boardLikeList.includes(userInfo._id)) {
+            copy = [...boardLikeList];
+            copy.push(userInfo._id);
+            setBoardLikeList(copy);
+        }
+        else if (boardLikeList.length !== 0 && boardLikeList.includes(userInfo._id)) {
+            copy = boardLikeList.filter(id => id !== userInfo._id);
+            setBoardLikeList(copy);
+        }
+        const data = {
+            boardId: board.boardId,
+            boardTitle: board.boardTitle,
+            boardType: board.boardType,
+            contentHTML: board.contentHTML,
+            contentRaw: board.contentRaw,
+            date: board.date,
+            images: board.images,
+            likeList: copy,
+            unLikeList: boardUnlikeList,
+            userId: board.userId,
+            userName: board.userName,
+            userPrimeId: board.userPrimeId,
+            views: board.views,
+        }
+        try {
+            const response = await fetch('http://localhost:8080/update/board/toggleLikeList', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                console.log('Success to update data');
+            } else {
+                console.log('Failed to update data');
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    };
+    const handleUnlikeClick = async () => {
+        console.log('unlike btn click');
+        let copy;
+        if (!boardUnlikeList.includes(userInfo._id)) {
+            copy = [...boardUnlikeList];
+            copy.push(userInfo._id);
+            setBoardUnlikeList(copy);
+        }
+        else if (boardUnlikeList.length !== 0 && boardUnlikeList.includes(userInfo._id)) {
+            copy = boardUnlikeList.filter(id => id !== userInfo._id);
+            setBoardUnlikeList(copy);
+        }
+        const data = {
+            boardId: board.boardId,
+            boardTitle: board.boardTitle,
+            boardType: board.boardType,
+            contentHTML: board.contentHTML,
+            contentRaw: board.contentRaw,
+            date: board.date,
+            images: board.images,
+            likeList: boardLikeList,
+            unLikeList: copy,
+            userId: board.userId,
+            userName: board.userName,
+            userPrimeId: board.userPrimeId,
+            views: board.views,
+        }
+        try {
+            const response = await fetch('http://localhost:8080/update/board/toggleUnlikeList', {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                console.log('Success to update data');
+            } else {
+                console.log('Failed to update data');
+            }
+        } catch (error) {
+            console.log('Error:', error);
+        }
     };
 
     return (
@@ -268,13 +364,19 @@ export default function BoardDetailPage() {
                         <BoardContentSection dangerouslySetInnerHTML={{ __html: board?.contentHTML }}>
                         </BoardContentSection>
                         <BoardLikeOrUnlikeSection>
-                            <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
+                            <ThumsImg
+                                src="/image/thumbs-up.svg"
+                                onClick={() => handleLikeClick(board)}
+                            ></ThumsImg>
                             <LikeUnlikeText $afterText={true}>
-                                {board?.likeList.length}
+                                {boardLikeList.length}
                             </LikeUnlikeText>
-                            <ThumsImg src="/image/thumbs-down.svg"></ThumsImg>
+                            <ThumsImg
+                                src="/image/thumbs-down.svg"
+                                onClick={handleUnlikeClick}
+                            ></ThumsImg>
                             <LikeUnlikeText $afterText={false}>
-                                {board?.unLikeList.length}
+                                {boardUnlikeList.length}
                             </LikeUnlikeText>
                         </BoardLikeOrUnlikeSection>
                     </BoardInfoSection>
