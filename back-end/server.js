@@ -110,7 +110,8 @@ app.post('/register/board', async function (req, res) {
         console.log('Received a regiBoard request to save data from the front end.');
         const {
             boardId,
-            boardType,
+            boardTypeValue,
+            boardTypeName,
             boardTitle,
             contentRaw,
             contentHTML,
@@ -127,7 +128,8 @@ app.post('/register/board', async function (req, res) {
         // 데이터베이스에 데이터 추가
         await db.collection('board').insertOne({
             boardId,
-            boardType,
+            boardTypeValue,
+            boardTypeName,
             boardTitle,
             contentRaw,
             contentHTML,
@@ -151,12 +153,45 @@ app.post('/register/board', async function (req, res) {
 // board list get
 app.get('/boardList', async function (req, res) {
     try {
-        console.log('getWysiwyg processing start');
+        console.log('get boardList start');
 
         const result = await db.collection('board').find({}).toArray();
         res.status(200).json(result);
     } catch (error) {
-        console.error('Error getting getWysiwyg data:', error);
+        console.error('Error getting boardList data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board list get
+app.get('/boardList/:moreURL', async function (req, res) {
+    try {
+        console.log('get boardList start');
+        const moreURL = req.params.moreURL;
+        console.log(moreURL);
+
+        const result = await db.collection('board').find(
+            { boardTypeValue: moreURL }
+        ).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting boardList data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// board list get by searchData
+app.get('/boardList/search/:searchData', async function (req, res) {
+    try {
+        console.log('get boardList start');
+        const searchData = req.params.searchData;
+        console.log(`<p>${searchData}</p>`);
+
+        const result = await db.collection('board').find({}).toArray();
+        // const result = await db.collection('board').find({
+        //     contentHTML: `<p>${searchData}</p>`
+        // }).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting boardList data:', error);
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });

@@ -184,6 +184,7 @@ const ErrorText = styled.p`
 
 export default function RegisterBoardPage() {
     const userInfo = useSelector((state) => (state.user.user));
+    const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
     // select board type ref
     const boardTypeRef = useRef(null);
     // input title ref
@@ -272,9 +273,12 @@ export default function RegisterBoardPage() {
         const contentHTML = draftToHtml(contentRaw);
         const randomString1 = Math.random().toString(36).substring(2, 14);
         const randomString2 = Math.random().toString(36).substring(2, 14);
+        // console.log(boardTypeList);
+        const matchedBoard = boardTypeList.find((element) => element.value === boardTypeRef.current.value);
         const data = {
             boardId: randomString1 + '-' + randomString2,
-            boardType: boardTypeRef.current.value,
+            boardTypeValue: matchedBoard.value,
+            boardTypeName: matchedBoard.name,
             boardTitle: inputValue,
             contentRaw: JSON.stringify(contentRaw),
             contentHTML: contentHTML,
@@ -290,7 +294,7 @@ export default function RegisterBoardPage() {
         // 데이터 유효성 검사하기
         const errors = [];
         // 1. 글 타입 확인하지 않았을 때
-        const isTypeError = data.boardType === '';
+        const isTypeError = data.boardTypeValue === '';
         if (isTypeError) {
             setIsOnErrBoardType(true);
             if (!errors.includes('카테고리')) {
@@ -340,7 +344,7 @@ export default function RegisterBoardPage() {
             setIsOnConfirmModal(false);
             return;
         } else {
-            // console.log(data);
+            console.log(data);
             setPrepareDate(data);
             setIsOnConfirmModal(true);
         }

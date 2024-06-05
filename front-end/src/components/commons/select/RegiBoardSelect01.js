@@ -12,6 +12,9 @@ const Wrapper = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 `;
+const HideInput = styled.input`
+    display: none;
+`;
 const InputWrapper = styled.div`
     width: 100%;
     height: 100%;
@@ -79,7 +82,7 @@ export default function RegiBoardSelect01({
     forwardRef
 }) {
     // select input ref
-    // const inputRef = useRef(null);
+    const renderInputRef = useRef(null);
     // option wrapper ref
     const selectRef = useRef(null);
     // option wrapper state
@@ -91,9 +94,9 @@ export default function RegiBoardSelect01({
         setIsOn(!isOn);
     };
     // option click set input value
-    const handleSetOptionValue = (name) => {
-        // console.log(name);
-        forwardRef.current.value = name;
+    const handleSetOptionValue = (boardType) => {
+        forwardRef.current.value = boardType.value;
+        renderInputRef.current.value = boardType.name;
         setIsOn(false);
     };
     useEffect(() => {
@@ -110,11 +113,12 @@ export default function RegiBoardSelect01({
 
     return (
         <Wrapper ref={selectRef}>
+            <HideInput ref={forwardRef}></HideInput>
             <InputWrapper
                 onClick={handleOptionOpen}
             >
                 <Input
-                    ref={forwardRef}
+                    ref={renderInputRef}
                     placeholder="글 카테고리"
                     readOnly
                 ></Input>
@@ -124,7 +128,7 @@ export default function RegiBoardSelect01({
                     boardTypeList.map((boardType, i) => (
                         <Option
                             key={i}
-                            onClick={() => handleSetOptionValue(boardType.name)}
+                            onClick={() => handleSetOptionValue(boardType)}
                         >{boardType.name}</Option>
                     ))
                 }

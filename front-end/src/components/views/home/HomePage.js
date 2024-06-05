@@ -327,7 +327,9 @@ export default function HomePage(props) {
                     boardType = await response.data;
                     // setItemList(await response.data);
                     // setIsLoading(false);
-                    store.dispatch(setBoardTypeList(boardType));
+                    if (boardTypeList.lenth !== boardType) {
+                        store.dispatch(setBoardTypeList(boardType));
+                    }
                 } catch (error) {
                     console.error('Error getting itemType data:', error);
                     throw error;

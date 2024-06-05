@@ -226,7 +226,6 @@ const BoardDateWrapper = styled.div`
 export default function BoardListBodyContainer({
     $location
 }) {
-    // console.log($location);
     // page navigate
     const navigate = useNavigate();
     // 목록 조회 전까지의 로딩
@@ -242,11 +241,75 @@ export default function BoardListBodyContainer({
     let [boardList, setBoardList] = useState([]);
     // search input ref
     const searchInputRef = useRef(null);
+    // fetching board list
+    useEffect(() => {
+        // console.log($location.split('/'));
+        if ($location.split('/').length === 2) {
+            // board
+            console.log('board page');
+            searchInputRef.current.value = '';
+            setIsLoading(true);
+            const fetchItems = async () => {
+                try {
+                    const fullURL = `http://localhost:8080/boardList`;
+                    const response = await axios.get(fullURL);
+                    const result = await response.data;
+                    setBoardList(result);
+                    setIsLoading(false);
+                    // console.log(result);
+                } catch (error) {
+                    console.error('Error getting itemType data:', error);
+                    throw error;
+                }
+            };
+            // fetchUserItems를 의존성 배열에 추가
+            fetchItems();
+        } else if ($location.split('/')[2] !== 'search') {
+            // board/more
+            console.log('board/more page');
+            searchInputRef.current.value = '';
+            setIsLoading(true);
+            const moreURL = $location.split('/')[2];
+            // console.log(moreURL);
+            const fetchItems = async () => {
+                try {
+                    const fullURL = `http://localhost:8080/boardList/${moreURL}`;
+                    const response = await axios.get(fullURL);
+                    const result = await response.data;
+                    setBoardList(result);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Error getting itemType data:', error);
+                    throw error;
+                }
+            };
+            // fetchUserItems를 의존성 배열에 추가
+            fetchItems();
+        }
+    }, [
+        $location
+    ]);
+    // click btn, move to register board
+    const handleClickResisterBoardBtn = () => {
+        navigate('/register/board');
+    };
     // search input ref get value
-    const handleSearchImgClick = () => {
+    const handleSearchImgClick = async () => {
+        setIsLoading(true);
+        console.log('/board/search page');
+        navigate('/board/search');
         const searchData = searchInputRef.current.value;
         console.log(searchData);
-        // window.location.href = '/board/search';
+        try {
+            const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
+            const response = await axios.get(fullURL);
+            const result = await response.data;
+            setBoardList(result);
+            setIsLoading(false);
+        } catch (error) {
+            console.error('Error getting itemType data:', error);
+            throw error;
+        }
     };
     // click board, update board.views
     // put userId in board.views
@@ -284,28 +347,6 @@ export default function BoardListBodyContainer({
             console.log('Error:', error);
         }
     };
-    // click btn, move to register board
-    const handleClickResisterBoardBtn = () => {
-        navigate('/register/board');
-    };
-    // fetching board list
-    useEffect(() => {
-        const fetchItems = async () => {
-            try {
-                const fullURL = `http://localhost:8080/boardList`;
-                const response = await axios.get(fullURL);
-                const result = await response.data;
-                setBoardList(result);
-                setIsLoading(false);
-                // console.log(result);
-            } catch (error) {
-                console.error('Error getting itemType data:', error);
-                throw error;
-            }
-        };
-        // fetchUserItems를 의존성 배열에 추가
-        fetchItems();
-    }, []);
 
     return (
         <Wrapper>
@@ -321,10 +362,13 @@ export default function BoardListBodyContainer({
                 }
                 <SearchBarContainer>
                     <SearchBarInputWrapper>
-                        <SearchBarInput ref={searchInputRef}></SearchBarInput>
+                        <SearchBarInput
+                            ref={searchInputRef}
+                            placeholder="검색어를 입력해주세요."
+                        ></SearchBarInput>
                     </SearchBarInputWrapper>
                     <SearchBarImgWrapper
-                        onClick={handleSearchImgClick}
+                        onClick={() => handleSearchImgClick()}
                     >
                         <SearchBarImg src="/image/search.svg"></SearchBarImg>
                     </SearchBarImgWrapper>
@@ -346,10 +390,9 @@ export default function BoardListBodyContainer({
                                             key={idx}
                                             $boardIndex={idx + 1}
                                             onClick={() => handleClickBoard(board)}>
-                                            <BoardTypeWrapper>[ {board.boardType} ]</BoardTypeWrapper>
+                                            <BoardTypeWrapper>[ {board.boardTypeName} ]</BoardTypeWrapper>
                                             <BoardWriterWrapper>{board.userId}</BoardWriterWrapper>
                                             <BoardTitleWrapper>{board.boardTitle}</BoardTitleWrapper>
-                                            <BoardViewsWrapper>{board.views.length}</BoardViewsWrapper>
                                             <BoardEmotionWrapper>
                                                 <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
                                                 <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>
@@ -357,6 +400,7 @@ export default function BoardListBodyContainer({
                                                 <BoardEmotionText $afterText={false}>{board.unLikeList.length}</BoardEmotionText>
                                             </BoardEmotionWrapper>
                                             <BoardDateWrapper>{board.date.slice(0, 10)}</BoardDateWrapper>
+                                            <BoardViewsWrapper>조회수 : {board.views.length}</BoardViewsWrapper>
                                         </BoardContainer>
 
                                     ))
