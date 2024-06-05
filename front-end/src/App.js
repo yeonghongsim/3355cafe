@@ -5,6 +5,8 @@ import { Route, Routes } from 'react-router-dom';
 import HomePage from './components/views/home/HomePage';
 import SignUpPage from './components/views/signup/SignUpPage';
 import LoginPage from './components/views/login/LoginPage';
+import UserInfoPage from './components/views/user/userInfo/UserInfoPage';
+import UpdateUserInfoPage from './components/views/user/updateUserInfo/UpdateUserInfoPage';
 import BoardListPage from './components/views/board/BoardListPage';
 import BoardListBodyContainer from './components/views/board/BoardListBodyContainer';
 import BoardDetailPage from './components/views/boardDetail/BoardDetailPage';
@@ -50,6 +52,8 @@ function App() {
         <Route path='/register'>
           <Route path='board' element={<RegisterBoardPage />}></Route>
         </Route>
+        <Route path='/userInfo' element={< UserInfoPage />}></Route>
+        <Route path='/update/userInfo' element={< UpdateUserInfoPage />}></Route>
         <Route path='/test1' element={< Test1 />}></Route>
         <Route path='/test2' element={< Test2Select />}></Route>
         <Route path='/test3' element={< Test3If />}></Route>

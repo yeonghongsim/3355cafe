@@ -4,6 +4,7 @@ import LoginBtn from "../button/LoginBtn";
 import SignupBtn from "../button/SignupBtn";
 import LogoutBtn from "../button/LogoutBtn";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
     width: 25rem;
@@ -118,11 +119,19 @@ const ButtonContainer = styled.div`
     padding: 0.5rem;
     box-sizing: border-box;
 `;
+const BoardLengthText = styled.span`
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    padding: 0 0.3rem 0 0.3rem;
+`;
 
 export default function BarModal({
     isOn
     , handleModalClose
 }) {
+    const navigate = useNavigate();
     const userInfo = useSelector((state) => state.user.user);
     const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     const modalRef = useRef(null);
@@ -145,6 +154,9 @@ export default function BarModal({
         , handleModalClose
         , modalRef
     ]);
+    const moveToUserInfoPage = () => {
+        navigate('/userInfo');
+    };
 
     return (
         <Wrapper $isOn={isOn} ref={modalRef}>
@@ -178,8 +190,14 @@ export default function BarModal({
                         :
                         <>
                             <ContentContainer>
-                                <ContentText $afterText="true">회원 정보</ContentText>
-                                <ContentText $afterText="false">내 게시글 ({myBoardList.length})개</ContentText>
+                                <ContentText
+                                    $afterText="true"
+                                    onClick={moveToUserInfoPage}
+                                >회원 정보</ContentText>
+                                <ContentText $afterText="false">
+                                    내 게시글(
+                                    <BoardLengthText>{myBoardList.length}</BoardLengthText>
+                                    )개</ContentText>
                             </ContentContainer>
                             <ButtonContainer>
                                 <LogoutBtn
