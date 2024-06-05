@@ -7,6 +7,8 @@ import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 import axios from "axios";
 import store from "../../../commons/store/store";
 import { setBoardTypeList } from "../../../commons/store/boardTypeList";
+import { setMyBoardList } from "../../../commons/store/myBoardList";
+import { setUser } from "../../../commons/store/userSlice";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -314,21 +316,50 @@ const FooterText = styled.p`
 `;
 
 export default function HomePage(props) {
-    // boardtypeList search n save in store
+    // userInfo section
+    let userInfo = useSelector((state) => state.user.user);
     // get boardTypeList in store
     const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
+    // boardtypeList search n save in store
     useEffect(() => {
-        if (boardTypeList !== null) {
-            let boardType;
-            const fetchItems = async () => {
+        console.log('get board type');
+        let boardTypes;
+        const fetchBoardTypeList = async () => {
+            try {
+                const fullURL = `http://localhost:8080/boardType`;
+                const response = await axios.get(fullURL);
+                boardTypes = await response.data;
+                // setItemList(await response.data);
+                // setIsLoading(false);
+                if (boardTypeList.length !== boardTypes.length) {
+                    store.dispatch(setBoardTypeList(boardTypes));
+                }
+            } catch (error) {
+                console.error('Error getting itemType data:', error);
+                throw error;
+            }
+        };
+        // fetchUserItems를 의존성 배열에 추가
+        fetchBoardTypeList();
+    }, [
+        boardTypeList
+    ]);
+    const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
+    useEffect(() => {
+        if (userInfo !== null) {
+            console.log('get my boardlist');
+            const fetchMyBoardList = async () => {
+                const userId = userInfo._id;
+                let myBoards;
                 try {
-                    const fullURL = `http://localhost:8080/boardType`;
+                    const fullURL = `http://localhost:8080/myBoardList/${userId}`;
                     const response = await axios.get(fullURL);
-                    boardType = await response.data;
-                    // setItemList(await response.data);
-                    // setIsLoading(false);
-                    if (boardTypeList.lenth !== boardType) {
-                        store.dispatch(setBoardTypeList(boardType));
+                    myBoards = await response.data;
+                    // console.log(myBoards);
+                    // setMyBoardList(myBoards);
+                    // store.dispatch(setMyBoardList(myBoards));
+                    if (myBoardList.length !== myBoards.length) {
+                        store.dispatch(setMyBoardList(myBoards));
                     }
                 } catch (error) {
                     console.error('Error getting itemType data:', error);
@@ -336,11 +367,12 @@ export default function HomePage(props) {
                 }
             };
             // fetchUserItems를 의존성 배열에 추가
-            fetchItems();
+            fetchMyBoardList();
         }
-    }, [boardTypeList]);
-    // userInfo section
-    const userInfo = useSelector((state) => state.user.user);
+    }, [
+        myBoardList
+        , userInfo
+    ])
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close
@@ -351,6 +383,9 @@ export default function HomePage(props) {
     // up-right side  modal close
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
+        setTimeout(() => {
+            setUser(null);
+        }, 750);
     }, []);
     // notice section
     const imsiNoticeTextList = ['공지사항1', '공지사항2', '공지사항3'];

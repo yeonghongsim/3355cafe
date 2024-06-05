@@ -16,8 +16,8 @@ const Wrapper = styled.div`
     right: 0;
     overflow: hidden;
     opacity: ${(props) => (props.$isOn === 'true' ? 1 : 0)};
-    transition: max-height .9s ease-in-out, opacity .6s ease-in-out;
-    // transition: all 1.2s ease-in-out;
+    transition: max-height .9s ease-in-out, opacity .78s ease-in-out;
+    // transition: all 0.9s ease-in-out;
     z-index: 200;
     padding: 0.5rem;
     box-sizing: border-box;
@@ -124,6 +124,7 @@ export default function BarModal({
     , handleModalClose
 }) {
     const userInfo = useSelector((state) => state.user.user);
+    const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     const modalRef = useRef(null);
 
     useEffect(() => {
@@ -178,7 +179,7 @@ export default function BarModal({
                         <>
                             <ContentContainer>
                                 <ContentText $afterText="true">회원 정보</ContentText>
-                                <ContentText $afterText="false">내 게시글(n)</ContentText>
+                                <ContentText $afterText="false">내 게시글 ({myBoardList.length})개</ContentText>
                             </ContentContainer>
                             <ButtonContainer>
                                 <LogoutBtn

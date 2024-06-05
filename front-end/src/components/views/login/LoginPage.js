@@ -126,10 +126,10 @@ export default function LoginPage() {
             })
             .then(data => {
                 if (data.result == null) {
-                    console.log('회원정보 불일치');
+                    // console.log('회원정보 불일치');
                     setErrorLogin(true);
                 } else {
-                    console.log('회원정보 일치');
+                    // console.log('회원정보 일치');
                     // console.log(data.result);
                     setErrorLogin(false);
                     const userInfo = {

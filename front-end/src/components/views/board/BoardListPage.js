@@ -6,6 +6,7 @@ import { useSelector } from "react-redux";
 import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 import { Outlet, useLocation } from "react-router-dom";
 import BoardListBodyContainer from "./BoardListBodyContainer";
+import { setUser } from "../../../commons/store/userSlice";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -119,6 +120,9 @@ export default function BoardListPage() {
     // up-right side  modal close
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
+        setTimeout(() => {
+            setUser(null);
+        }, 1000);
     }, []);
 
     return (

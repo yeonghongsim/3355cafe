@@ -2,6 +2,7 @@ import styled, { keyframes } from "styled-components"
 
 const Wrapper = styled.div`
     width: 100%;
+    height: 15rem;
     box-sizing: border-box;
     display: flex;
     align-items: center;

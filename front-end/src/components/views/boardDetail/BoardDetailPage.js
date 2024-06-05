@@ -1,9 +1,12 @@
 import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSelector } from "react-redux";
+import axios from "axios";
+import Spinner from "../../commons/hooks/Spinner";
+import { setUser } from "../../../commons/store/userSlice";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -188,9 +191,32 @@ const BoardReplySection = styled.section`
 export default function BoardDetailPage() {
     const navigate = useNavigate();
     const location = useLocation();
+    // 목록 조회 전까지의 로딩
+    const [isLoading, setIsLoading] = useState(true);
     const userInfo = useSelector((state) => state.user.user);
-    // 받아온 데이터
-    let board = location.state?.board;
+    const boardId = location.state?.boardId;
+    let [board, setBoard] = useState();
+    let [boardLikeList, setBoardLikeList] = useState([]);
+    let [boardUnlikeList, setBoardUnlikeList] = useState([]);
+    useEffect(() => {
+        const fetchingBoardDetail = async () => {
+            try {
+                const fullURL = `http://localhost:8080/boardDetail/${boardId}`;
+                const response = await axios.get(fullURL);
+                const result = await response.data;
+                setBoardLikeList(result.likeList);
+                setBoardUnlikeList(result.unLikeList);
+                setBoard(result);
+                setIsLoading(false);
+            } catch (error) {
+                console.error('Error getting board detail data:', error);
+                throw error;
+            }
+        };
+        fetchingBoardDetail();
+    }, [
+        boardId
+    ]);
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close
@@ -201,14 +227,15 @@ export default function BoardDetailPage() {
     // up-right side  modal close
     const handleModalClose = useCallback(() => {
         setIsOnBarModal(false);
+        setTimeout(() => {
+            setUser(null);
+        }, 1000);
     }, []);
     const handlePageBack = () => {
         navigate('/board');
     };
-    let [boardLikeList, setBoardLikeList] = useState(board.likeList);
-    let [boardUnlikeList, setBoardUnlikeList] = useState(board.unLikeList);
     const handleLikeClick = async (board) => {
-        console.log('like btn click');
+        // console.log('like btn click');
         let copy;
         if (!boardLikeList.includes(userInfo._id)) {
             copy = [...boardLikeList];
@@ -245,7 +272,7 @@ export default function BoardDetailPage() {
             });
 
             if (response.ok) {
-                console.log('Success to update data');
+                // console.log('Success to update data');
             } else {
                 console.log('Failed to update data');
             }
@@ -254,7 +281,7 @@ export default function BoardDetailPage() {
         }
     };
     const handleUnlikeClick = async () => {
-        console.log('unlike btn click');
+        // console.log('unlike btn click');
         let copy;
         if (!boardUnlikeList.includes(userInfo._id)) {
             copy = [...boardUnlikeList];
@@ -291,7 +318,7 @@ export default function BoardDetailPage() {
             });
 
             if (response.ok) {
-                console.log('Success to update data');
+                // console.log('Success to update data');
             } else {
                 console.log('Failed to update data');
             }
@@ -325,66 +352,85 @@ export default function BoardDetailPage() {
             </HeaderSection>
             <BodySection>
                 <SmallWrapper>
-                    <BackTextContainer>
-                        <BackText onClick={() => handlePageBack()}>뒤로 가기</BackText>
-                    </BackTextContainer>
-                    <BoardInfoSection>
-                        <BoardHeaderSection>
-                            <HeaderLayer
-                                $isLast={false}
-                                $justifyContent="flex-end"
-                            >
-                                <HeaderTextWrapper $borderLeft={true}>
-                                    <HeaderText $fontSize='1.4rem'>
-                                        {board?.userId}
-                                    </HeaderText>
-                                </HeaderTextWrapper>
-                                <HeaderTextWrapper $borderLeft={true}>
-                                    <HeaderText $fontSize='1.4rem'>
-                                        {board?.date.slice(0, 10)}
-                                    </HeaderText>
-                                </HeaderTextWrapper>
-                                <HeaderTextWrapper $borderLeft={true}>
-                                    <HeaderText $fontSize='1.4rem'>
-                                        조회수 {board?.views.length}
-                                    </HeaderText>
-                                </HeaderTextWrapper>
-                            </HeaderLayer>
-                            <HeaderLayer
-                                $isLast={true}
-                                $justifyContent="center"
-                            >
-                                <HeaderTextWrapper $borderLeft={false}>
-                                    <HeaderText $fontSize='1.8rem'>
-                                        {board?.boardTitle}
-                                    </HeaderText>
-                                </HeaderTextWrapper>
-                            </HeaderLayer>
-                        </BoardHeaderSection>
-                        <BoardContentSection dangerouslySetInnerHTML={{ __html: board?.contentHTML }}>
-                        </BoardContentSection>
-                        <BoardLikeOrUnlikeSection>
-                            <ThumsImg
-                                src="/image/thumbs-up.svg"
-                                onClick={() => handleLikeClick(board)}
-                            ></ThumsImg>
-                            <LikeUnlikeText $afterText={true}>
-                                {boardLikeList.length}
-                            </LikeUnlikeText>
-                            <ThumsImg
-                                src="/image/thumbs-down.svg"
-                                onClick={handleUnlikeClick}
-                            ></ThumsImg>
-                            <LikeUnlikeText $afterText={false}>
-                                {boardUnlikeList.length}
-                            </LikeUnlikeText>
-                        </BoardLikeOrUnlikeSection>
-                    </BoardInfoSection>
-                    <BoardReplySection>
-                        댓글 공간
-                    </BoardReplySection>
+                    {
+                        isLoading ? <Spinner></Spinner> :
+                            <>
+                                <BackTextContainer>
+                                    <BackText onClick={() => handlePageBack()}>뒤로 가기</BackText>
+                                </BackTextContainer>
+                                <BoardInfoSection>
+                                    <BoardHeaderSection>
+                                        <HeaderLayer
+                                            $isLast={false}
+                                            $justifyContent="flex-end"
+                                        >
+                                            <HeaderTextWrapper $borderLeft={true}>
+                                                <HeaderText $fontSize='1.4rem'>
+                                                    {board?.userId}
+                                                </HeaderText>
+                                            </HeaderTextWrapper>
+                                            <HeaderTextWrapper $borderLeft={true}>
+                                                <HeaderText $fontSize='1.4rem'>
+                                                    {board?.date.slice(0, 10)}
+                                                </HeaderText>
+                                            </HeaderTextWrapper>
+                                            <HeaderTextWrapper $borderLeft={true}>
+                                                <HeaderText $fontSize='1.4rem'>
+                                                    조회수 {board?.views.length}
+                                                </HeaderText>
+                                            </HeaderTextWrapper>
+                                        </HeaderLayer>
+                                        <HeaderLayer
+                                            $isLast={true}
+                                            $justifyContent="center"
+                                        >
+                                            <HeaderTextWrapper $borderLeft={false}>
+                                                <HeaderText $fontSize='1.8rem'>
+                                                    {board?.boardTitle}
+                                                </HeaderText>
+                                            </HeaderTextWrapper>
+                                        </HeaderLayer>
+                                    </BoardHeaderSection>
+                                    <BoardContentSection dangerouslySetInnerHTML={{ __html: board?.contentHTML }}>
+                                    </BoardContentSection>
+                                    <BoardLikeOrUnlikeSection>
+                                        {
+                                            boardLikeList.includes(userInfo._id) ?
+                                                <ThumsImg
+                                                    src="/image/onThumbs-up.svg"
+                                                    onClick={() => handleLikeClick(board)}
+                                                ></ThumsImg>
+                                                : <ThumsImg
+                                                    src="/image/offThumbs-up.svg"
+                                                    onClick={() => handleLikeClick(board)}
+                                                ></ThumsImg>
+                                        }
+                                        <LikeUnlikeText $afterText={true}>
+                                            {boardLikeList.length}
+                                        </LikeUnlikeText>
+                                        {
+                                            boardUnlikeList.includes(userInfo._id) ?
+                                                <ThumsImg
+                                                    src="/image/onThumbs-down.svg"
+                                                    onClick={handleUnlikeClick}
+                                                ></ThumsImg>
+                                                : <ThumsImg
+                                                    src="/image/offThumbs-down.svg"
+                                                    onClick={handleUnlikeClick}
+                                                ></ThumsImg>
+                                        }
+                                        <LikeUnlikeText $afterText={false}>
+                                            {boardUnlikeList.length}
+                                        </LikeUnlikeText>
+                                    </BoardLikeOrUnlikeSection>
+                                </BoardInfoSection>
+                                <BoardReplySection>
+                                    댓글 공간
+                                </BoardReplySection>
+                            </>
+                    }
                 </SmallWrapper>
-            </BodySection>
-        </Wrapper>
+            </BodySection >
+        </Wrapper >
     )
 }

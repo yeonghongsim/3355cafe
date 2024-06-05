@@ -4,15 +4,17 @@ import { persistReducer } from 'redux-persist';
 
 import userSlice from "./userSlice";
 import boardTypeList from './boardTypeList';
+import myBoardList from './myBoardList';
 
 const reducers = combineReducers({
     user: userSlice.reducer,
     boardTypeList: boardTypeList.reducer,
+    myBoardList: myBoardList.reducer,
 });
 const persistConfig = {
     key: 'root',
     storage,
-    whitelist: ['user', 'boardTypeList']
+    whitelist: ['user', 'boardTypeList', 'myBoardList']
 };
 const persistedReducer = persistReducer(persistConfig, reducers);
 const store = configureStore({

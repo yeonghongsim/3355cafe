@@ -338,8 +338,9 @@ export default function BoardListBodyContainer({
             if (response.ok) {
                 const data = await response.json();
                 const board = data.board;
+                const boardId = board._id;
                 // console.log(data.board);
-                navigate(`/boardDetail/${data.board._id}`, { state: { board } });
+                navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
             } else {
                 console.log('Failed to update data');
             }
@@ -394,9 +395,17 @@ export default function BoardListBodyContainer({
                                             <BoardWriterWrapper>{board.userId}</BoardWriterWrapper>
                                             <BoardTitleWrapper>{board.boardTitle}</BoardTitleWrapper>
                                             <BoardEmotionWrapper>
-                                                <ThumsImg src="/image/thumbs-up.svg"></ThumsImg>
+                                                {
+                                                    board.likeList.includes(userInfo?._id) ?
+                                                        <ThumsImg src="/image/onThumbs-up.svg"></ThumsImg>
+                                                        : <ThumsImg src="/image/offThumbs-up.svg"></ThumsImg>
+                                                }
                                                 <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>
-                                                <ThumsImg src="/image/thumbs-down.svg"></ThumsImg>
+                                                {
+                                                    board.unLikeList.includes(userInfo?._id) ?
+                                                        <ThumsImg src="/image/onThumbs-down.svg"></ThumsImg>
+                                                        : <ThumsImg src="/image/offThumbs-down.svg"></ThumsImg>
+                                                }
                                                 <BoardEmotionText $afterText={false}>{board.unLikeList.length}</BoardEmotionText>
                                             </BoardEmotionWrapper>
                                             <BoardDateWrapper>{board.date.slice(0, 10)}</BoardDateWrapper>

@@ -104,6 +104,25 @@ app.get('/boardType', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// get user's board list
+app.get('/myBoardList/:userId', async function (req, res) {
+    console.log('myBoardList processing start');
+    const userId = req.params.userId;
+    console.log(userId);
+
+    try {
+        console.log('myBoardList processing start');
+
+        const result = await db.collection('board').find({
+            userPrimeId: userId
+        }).toArray();
+        res.status(200).json(result);
+        console.log(result);
+    } catch (error) {
+        console.error('Error getting boardType data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 // register board
 app.post('/register/board', async function (req, res) {
     try {
@@ -189,6 +208,22 @@ app.get('/boardList/search/:searchData', async function (req, res) {
         // const result = await db.collection('board').find({
         //     contentHTML: `<p>${searchData}</p>`
         // }).toArray();
+        res.status(200).json(result);
+    } catch (error) {
+        console.error('Error getting boardList data:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
+// get board detail
+app.get('/boardDetail/:boardId', async function (req, res) {
+    try {
+        console.log('get board detail start');
+        const boardId = req.params.boardId;
+
+        const result = await db.collection('board').findOne({
+            _id: new ObjectId(boardId)
+        });
+        console.log(result);
         res.status(200).json(result);
     } catch (error) {
         console.error('Error getting boardList data:', error);

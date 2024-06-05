@@ -344,7 +344,7 @@ export default function RegisterBoardPage() {
             setIsOnConfirmModal(false);
             return;
         } else {
-            console.log(data);
+            // console.log(data);
             setPrepareDate(data);
             setIsOnConfirmModal(true);
         }
