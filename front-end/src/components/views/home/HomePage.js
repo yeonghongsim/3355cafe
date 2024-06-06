@@ -322,7 +322,7 @@ export default function HomePage(props) {
     const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
     // boardtypeList search n save in store
     useEffect(() => {
-        console.log('get board type');
+        // console.log('get board type');
         let boardTypes;
         const fetchBoardTypeList = async () => {
             try {
@@ -347,7 +347,7 @@ export default function HomePage(props) {
     const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     useEffect(() => {
         if (userInfo !== null) {
-            console.log('get my boardlist');
+            // console.log('get my boardlist');
             const fetchMyBoardList = async () => {
                 const userId = userInfo._id;
                 let myBoards;

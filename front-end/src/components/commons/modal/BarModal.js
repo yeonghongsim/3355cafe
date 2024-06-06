@@ -157,6 +157,9 @@ export default function BarModal({
     const moveToUserInfoPage = () => {
         navigate('/userInfo');
     };
+    const moveToMyBoardListPage = (myBoardList) => {
+        navigate('/myBoardList', { state: { myBoardList } });
+    };
 
     return (
         <Wrapper $isOn={isOn} ref={modalRef}>
@@ -194,7 +197,9 @@ export default function BarModal({
                                     $afterText="true"
                                     onClick={moveToUserInfoPage}
                                 >회원 정보</ContentText>
-                                <ContentText $afterText="false">
+                                <ContentText
+                                    $afterText="false"
+                                    onClick={() => moveToMyBoardListPage(myBoardList)}>
                                     내 게시글(
                                     <BoardLengthText>{myBoardList.length}</BoardLengthText>
                                     )개</ContentText>

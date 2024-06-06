@@ -194,28 +194,108 @@ export default function BoardDetailPage() {
     // 목록 조회 전까지의 로딩
     const [isLoading, setIsLoading] = useState(true);
     const userInfo = useSelector((state) => state.user.user);
-    const boardId = location.state?.boardId;
+    const propsBoard = location.state?.board;
     let [board, setBoard] = useState();
     let [boardLikeList, setBoardLikeList] = useState([]);
     let [boardUnlikeList, setBoardUnlikeList] = useState([]);
     useEffect(() => {
-        const fetchingBoardDetail = async () => {
-            try {
-                const fullURL = `http://localhost:8080/boardDetail/${boardId}`;
-                const response = await axios.get(fullURL);
-                const result = await response.data;
-                setBoardLikeList(result.likeList);
-                setBoardUnlikeList(result.unLikeList);
-                setBoard(result);
-                setIsLoading(false);
-            } catch (error) {
-                console.error('Error getting board detail data:', error);
-                throw error;
-            }
-        };
-        fetchingBoardDetail();
+        let beforeBoard = propsBoard;
+        if (!beforeBoard.views.includes(userInfo._id)) {
+            // console.log('views에 userId 추가 후 update 쿼리 실행')
+            beforeBoard.views.push(userInfo._id);
+            // update board views
+            const fetchingAddUserIdInBoardViews = async () => {
+                try {
+                    const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
+                        method: "POST",
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(beforeBoard),
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const result = data.board;
+                        // console.log(result);
+                        setBoardLikeList(result.likeList);
+                        setBoardUnlikeList(result.unLikeList);
+                        setBoard(result);
+                        setIsLoading(false);
+                        // navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
+                    } else {
+                        console.log('Failed to update data');
+                    }
+                } catch (error) {
+                    console.log('Error:', error);
+                }
+            };
+            fetchingAddUserIdInBoardViews();
+        } else {
+            // console.log('get 쿼리 실행')
+            // get board detail
+            const fetchingBoardDetail = async () => {
+                try {
+                    const boardId = propsBoard._id;
+                    const fullURL = `http://localhost:8080/boardDetail/${boardId}`;
+                    const response = await axios.get(fullURL);
+                    const result = await response.data;
+                    setBoardLikeList(result.likeList);
+                    setBoardUnlikeList(result.unLikeList);
+                    setBoard(result);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Error getting board detail data:', error);
+                    throw error;
+                }
+            };
+            fetchingBoardDetail();
+        }
+        // const handleUpdateBoardViews = async () => {
+        //     console.log('update board views')
+        //     const beforeBoard = propsBoard;
+        //     console.log(beforeBoard);
+        //     try {
+        //         if (!beforeBoard.views.includes(userInfo._id)) {
+        //             beforeBoard.views.push(userInfo._id);
+        //         }
+        //         const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
+        //             method: "POST",
+        //             headers: {
+        //                 'Accept': 'application/json',
+        //                 'Content-Type': 'application/json'
+        //             },
+        //             body: JSON.stringify(beforeBoard),
+        //         });
+        //         if (response.ok) {
+        //             console.log('success to update data');
+        //         } else {
+        //             console.log('Failed to update data');
+        //         }
+        //     } catch (error) {
+        //         console.log('Error:', error);
+        //     }
+        // };
+        // handleUpdateBoardViews();
+        // const fetchingBoardDetail = async () => {
+        //     try {
+        //         const boardId = propsBoard._id;
+        //         const fullURL = `http://localhost:8080/boardDetail/${boardId}`;
+        //         const response = await axios.get(fullURL);
+        //         const result = await response.data;
+        //         setBoardLikeList(result.likeList);
+        //         setBoardUnlikeList(result.unLikeList);
+        //         setBoard(result);
+        //         setIsLoading(false);
+        //     } catch (error) {
+        //         console.error('Error getting board detail data:', error);
+        //         throw error;
+        //     }
+        // };
+        // fetchingBoardDetail();
     }, [
-        boardId
+        propsBoard,
+        userInfo
     ]);
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);

@@ -322,31 +322,33 @@ export default function BoardListBodyContainer({
         }
     };
     const handleUpdateBoardViews = async (board) => {
-        if (!board.views.includes(userInfo._id)) {
-            board.views.push(userInfo._id);
-        }
-        try {
-            const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
-                method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(board),
-            });
+        // navigate(`/boardDetail/${board._id}`, { state: { board } });
+        // if (!board.views.includes(userInfo._id)) {
+        //     board.views.push(userInfo._id);
+        // }
+        // try {
+        //     const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
+        //         method: "POST",
+        //         headers: {
+        //             'Accept': 'application/json',
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify(board),
+        //     });
 
-            if (response.ok) {
-                const data = await response.json();
-                const board = data.board;
-                const boardId = board._id;
-                // console.log(data.board);
-                navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
-            } else {
-                console.log('Failed to update data');
-            }
-        } catch (error) {
-            console.log('Error:', error);
-        }
+        //     if (response.ok) {
+        //         const data = await response.json();
+        //         const board = data.board;
+        //         const boardId = board._id;
+        //         // console.log(data.board);
+        //         navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
+        //     } else {
+        //         console.log('Failed to update data');
+        //     }
+        // } catch (error) {
+        //     console.log('Error:', error);
+        // }
+        navigate(`/boardDetail/${board._id}`, { state: { board } });
     };
 
     return (
