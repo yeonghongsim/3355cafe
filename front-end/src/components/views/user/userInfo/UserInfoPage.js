@@ -39,7 +39,7 @@ const BackOrUpdateText = styled.p`
     color: black;
     &:hover {
         color: blue;
-        text-decoration: blue;
+        text-decoration: underline;
         cursor: pointer;
     }
 `;
@@ -110,7 +110,7 @@ export default function UserInfoPage() {
                     <BackOrUpdateTextContainer>
                         <BackOrUpdateText
                             onClick={() => moveToHomePage('/')}
-                        >홈페이지</BackOrUpdateText>
+                        >홈페이지로 가기</BackOrUpdateText>
                         <BackOrUpdateText
                             onClick={() => moveToHomePage('/update/userInfo')}
                         >내 정보 수정</BackOrUpdateText>

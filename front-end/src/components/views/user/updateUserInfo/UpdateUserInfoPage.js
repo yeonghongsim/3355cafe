@@ -2,6 +2,8 @@ import { useSelector } from "react-redux";
 import styled from "styled-components"
 import FormInputWithLabel02 from "../../../commons/input/FormInputWithLabel02";
 import { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import imageCompression from 'browser-image-compression';
 
 const Wrapper = styled.div`
     width: 100%;
@@ -9,12 +11,17 @@ const Wrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
 `;
 const BodySection = styled.section`
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    gap: 1rem;
+    gap: 2rem;
 
     @media screen and (max-width: 1024px){
         flex-direction: column;
@@ -35,7 +42,7 @@ const FormContainer = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
 `;
-const Form = styled.div`
+const Form = styled.form`
     width: 100%;
     height: 75%;
 `;
@@ -59,8 +66,10 @@ const ImgContainer = styled.div`
     width: 15rem;
     height: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 0.5rem;
 `;
 const ImgWrapper = styled.div`
     width: 12rem;
@@ -71,16 +80,32 @@ const ImgWrapper = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-top: 2rem;
+    // margin-top: 2rem;
     box-sizing: border-box;
-    &:hover {
-        cursor: pointer;
-    }
 `;
 const Img = styled.img`
     width: 55%;
     height: 55%
     flex-shrink: 0;
+`;
+const ImgUplodaBtn = styled.div`
+    width: 80%;
+    height: 4rem;
+    background-color: ${(props) => (props.$bgColor)};
+    transition: all 0.8s;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.6rem;
+    font-weight: bold;
+    opacity: 0.8;
+    &:hover {
+        cursor: pointer;
+        scale: 1.03;
+        opacity: 1;
+    }
 `;
 const NameNumberContainer = styled.div`
     width: calc(100% - 15rem);
@@ -123,8 +148,28 @@ const Btn = styled.div`
 const HideInput = styled.input`
     display: none;
 `;
+const FootSection = styled.section`
+    width: 70%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+`;
+const LinkText = styled.p`
+    font-size: 1.6rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    &:hover {
+        cursor: pointer;
+        color: blue;
+        text-decoration: underline;
+    }
+`;
 
 export default function UpdateUserInfoPage() {
+    const navigate = useNavigate();
     // get userInfo from store
     const userInfo = useSelector((state) => state.user.user);
     // refs
@@ -138,6 +183,8 @@ export default function UpdateUserInfoPage() {
     let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
     let [isOnErrUserName, setIsOnErrUserName] = useState(false);
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
+    // img selected
+    let [isImgSelected, setIsImgSelected] = useState(false);
     const handleUpdateUserLog = () => {
         const userId = userIdRef.current.value;
         const userPassword = userPwRef.current.value;
@@ -200,8 +247,80 @@ export default function UpdateUserInfoPage() {
             setIsOnErrPhoneNumber(false);
         }
     };
-    const handleImgClick = () => {
+    // 파일 삭제 및 모든 정보 초기화
+    const handleFileRemove = () => {
+        console.log('img file delete btn click');
+        // setSelectedImg('/icons/icon_profile.svg');
+        // setIsImgSelected(false);
+        // setUserProfileImage({
+        //     fileURL: null,
+        //     fileName: null
+        // });
+        // if (userInfo?.profileImgURL === null) {
+        //     setChangeProfileImg(false);
+        // } else {
+        //     setChangeProfileImg(true);
+        // }
+    };
+    // 이미지 파일 등록 버튼 클릭
+    const handleFileClick = () => {
         imgRef.current.click();
+    };
+    // Blob 데이터를 Base64로 인코딩하는 함수
+    const readFileAsDataURL = (file) => {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                resolve(reader.result);
+            };
+            reader.readAsDataURL(file);
+        });
+    };
+    // 이미지 파일 축소
+    const compressAndEncodeImage = async (file) => {
+        const options = {
+            maxSizeMB: 0.5, // 최대 파일 크기 (0.5MB로 설정)
+            maxWidthOrHeight: 800, // 이미지 최대 폭 또는 높이 800px
+            useWebWorker: true, // 웹 워커 사용 여부
+        };
+        try {
+            const compressedFile = await imageCompression(file, options);
+            const compressedDataURL = await readFileAsDataURL(compressedFile);
+            return compressedDataURL;
+        } catch (error) {
+            console.error('이미지 압축 오류: ', error);
+            return null;
+        }
+    };
+    // 파일 변경 함수
+    const handleFileChange = async (e) => {
+        const file = e.target.files[0];
+        console.log(file);
+        // if (file) {
+        //     try {
+        //         // 이미지 압축 후 Base64로 인코딩
+        //         const compressedImage = await compressAndEncodeImage(file);
+        //         if (compressedImage) {
+        //             const fileUrl = compressedImage;
+        //             setSelectedImg(fileUrl);
+        //             setIsSelectedImg(true);
+        //             setUserProfileImage({
+        //                 fileURL: fileUrl,
+        //                 fileName: file.name
+        //             });
+        //             if (userInfo.profileImgName === file.name) {
+        //                 setChangeProfileImg(false);
+        //             } else {
+        //                 setChangeProfileImg(true);
+        //             }
+        //         } else {
+        //             // 압축에 실패한 경우에 대한 처리 (예: 알림, 기타 로직 추가)
+        //             console.error('이미지 압축에 실패했습니다.');
+        //         }
+        //     } catch (error) {
+        //         console.error("Error encoding file:", error);
+        //     }
+        // }
     };
     const handleInputFireSpace = (e) => {
         const newValue = e.target.value.replace(/\s+/g, '');
@@ -209,6 +328,9 @@ export default function UpdateUserInfoPage() {
             // 공백이 제거된 경우, input 필드의 값을 업데이트합니다.
             e.target.value = newValue;
         }
+    };
+    const moveToHomePage = (path) => {
+        navigate(path);
     };
     return (
         <Wrapper>
@@ -255,15 +377,26 @@ export default function UpdateUserInfoPage() {
                     <Form>
                         <InfoContainer>
                             <ImgContainer>
-                                <ImgWrapper
-                                    onClick={handleImgClick}
-                                >
+                                <ImgWrapper>
                                     <Img src="/image/profile.svg"></Img>
                                 </ImgWrapper>
+                                {
+                                    isImgSelected ?
+                                        <ImgUplodaBtn
+                                            onClick={handleFileRemove}
+                                            $bgColor="#FF0000"
+                                        >이미지 삭제</ImgUplodaBtn>
+                                        : <ImgUplodaBtn
+                                            onClick={handleFileClick}
+                                            $bgColor="#3572EF"
+                                        >이미지 업로드</ImgUplodaBtn>
+                                }
                             </ImgContainer>
                             <HideInput
                                 ref={imgRef}
                                 type="file"
+                                id="imgFile"
+                                onChange={handleFileChange}
                             ></HideInput>
                             <NameNumberContainer>
                                 <InputWrapper>
@@ -305,6 +438,10 @@ export default function UpdateUserInfoPage() {
                     </BtnContainer>
                 </FormContainer>
             </BodySection>
+            <FootSection>
+                <LinkText onClick={() => moveToHomePage('/userInfo')}>뒤로 가기</LinkText>
+                <LinkText onClick={() => moveToHomePage('/')}>홈페이지</LinkText>
+            </FootSection>
         </Wrapper>
     )
 }
