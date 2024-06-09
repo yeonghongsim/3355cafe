@@ -4,6 +4,7 @@ import FormInputWithLabel02 from "../../../commons/input/FormInputWithLabel02";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import imageCompression from 'browser-image-compression';
+import UpdateUserInfoModal from "../../../commons/modal/UpdateUserInfoModal";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -142,7 +143,6 @@ const Btn = styled.div`
     &:hover {
         cursor: pointer;
         background-color: blue;
-        scale: 1.05;
     }
 `;
 const HideInput = styled.input`
@@ -185,6 +185,15 @@ export default function UpdateUserInfoPage() {
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
     // img selected
     let [isImgSelected, setIsImgSelected] = useState(false);
+    // confirmModal
+    let [isOnUpdateModal, setIsOnUpdateModal] = useState(false);
+    // whatUpdate ? loginfo or userInfo
+    let [whatUpdate, setWhatUpdate] = useState('');
+    // prepareData
+    let [prepareData, setPrepareData] = useState({});
+    const handleCloseModal = () => {
+        setIsOnUpdateModal(false);
+    };
     const handleUpdateUserLog = () => {
         const userId = userIdRef.current.value;
         const userPassword = userPwRef.current.value;
@@ -192,7 +201,7 @@ export default function UpdateUserInfoPage() {
             userId: userId,
             userPassword: userPassword,
         }
-        console.log(data);
+        // console.log(data);
         // 데이터 유효성 검사하기
         // 아이디
         // 숫자,영문 각 최소 하나 이상 포함한 6-15자리
@@ -214,6 +223,14 @@ export default function UpdateUserInfoPage() {
             console.log('적합');
             setIsOnErrUserPw(false);
         }
+        if (idValid && pwValid) {
+            setIsOnUpdateModal(true);
+            setWhatUpdate('logInfo');
+            setPrepareData(data);
+        } else {
+            setWhatUpdate('');
+            setPrepareData({});
+        }
     };
     const handleUpdateUserInfo = () => {
         const data = {
@@ -222,7 +239,7 @@ export default function UpdateUserInfoPage() {
             userName: userNameRef.current.value,
             phoneNumber: phoneNumberRef.current.value,
         }
-        console.log(data)
+        // console.log(data)
         // 데이터 유효성 검사하기
         // 프로필이름
         // 프로필경로
@@ -245,6 +262,14 @@ export default function UpdateUserInfoPage() {
         } else {
             console.log('적합');
             setIsOnErrPhoneNumber(false);
+        }
+        if (nameValid && !phoneNumberValid) {
+            setIsOnUpdateModal(true);
+            setWhatUpdate('userInfo');
+            setPrepareData(data);
+        } else {
+            setWhatUpdate('');
+            setPrepareData({});
         }
     };
     // 파일 삭제 및 모든 정보 초기화
@@ -344,7 +369,7 @@ export default function UpdateUserInfoPage() {
                                     id="userId"
                                     name="userId"
                                     forwardRef={userIdRef}
-                                    defaultValue={userInfo.userId}
+                                    defaultValue={userInfo?.userId}
                                     onInput={handleInputFireSpace}
                                     placeholder="숫자,영문 혼합 6-15자리"
                                     isOnErr={isOnErrUserId}
@@ -405,7 +430,7 @@ export default function UpdateUserInfoPage() {
                                         id="userName"
                                         name="userName"
                                         forwardRef={userNameRef}
-                                        defaultValue={userInfo.userName}
+                                        defaultValue={userInfo?.userName}
                                         placeholder="한글명"
                                         onInput={handleInputFireSpace}
                                         isOnErr={isOnErrUserName}
@@ -442,6 +467,12 @@ export default function UpdateUserInfoPage() {
                 <LinkText onClick={() => moveToHomePage('/userInfo')}>뒤로 가기</LinkText>
                 <LinkText onClick={() => moveToHomePage('/')}>홈페이지</LinkText>
             </FootSection>
+            <UpdateUserInfoModal
+                isOn={isOnUpdateModal}
+                handleCloseModal={handleCloseModal}
+                whatUpdate={whatUpdate}
+                prepareData={prepareData}
+            ></UpdateUserInfoModal>
         </Wrapper>
     )
 }

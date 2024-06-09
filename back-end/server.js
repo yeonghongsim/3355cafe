@@ -297,6 +297,25 @@ app.post('/update/board/toggleUnlikeList', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// /update/user/${userId}/logInfo
+app.post('/update/user/:userId/logInfo', async function (req, res) {
+    console.log('start update board');
+    try {
+        const userId = req.params.userId;
+        const data = req.body;
+        console.log(userId);
+        console.log(data);
+        await db.collection('users').updateOne(
+            { _id: new ObjectId(userId) },
+            { $set: data }
+        )
+        res.status(200).json({ message: 'Success' });
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // --- test6 관련
 // wysiwyg post
