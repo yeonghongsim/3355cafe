@@ -102,7 +102,10 @@ export default function LoginPage() {
     let [errorLogin, setErrorLogin] = useState();
 
     const handleFindInfo = () => {
-        console.log('try to find id/pw')
+        console.log('try to find id/pw');
+    };
+    const moveToRegisterUserPage = () => {
+        navigate('/signUp');
     };
     const handleLoginBtnClick = async () => {
         const data = {
@@ -190,8 +193,11 @@ export default function LoginPage() {
                             <ErrorAnnounceText>*아이디 또는 비밀번호를 확인해 주세요.</ErrorAnnounceText>
                         </Layer>
                     }
-                    <Layer onClick={handleFindInfo}>
-                        <Text>아이디 / 비밀번호 찾기</Text>
+                    <Layer>
+                        <Text onClick={handleFindInfo}>아이디 / 비밀번호 찾기</Text>
+                    </Layer>
+                    <Layer>
+                        <Text onClick={moveToRegisterUserPage}>회원 가입 하러가기</Text>
                     </Layer>
                     <Layer>
                         <BtnContainer onClick={handleLoginBtnClick}>
