@@ -285,7 +285,7 @@ export default function SignUpPage() {
             const prepareData = { ...data };
             // 연락처 010 추가
             prepareData.phoneNumber = '010-' + prepareData.phoneNumber.slice(0, 4)
-                + '-' + prepareData.phoneNumber.slice(5, 8);
+                + '-' + prepareData.phoneNumber.slice(4, 8);
             // 생년월일 중 월과 일의 자릿수 체크
             // 한자리 일 경우 앞에 '0' 추가
             let month = prepareData.birth.split('/')[0];
@@ -299,6 +299,7 @@ export default function SignUpPage() {
             prepareData.birth = month + '/' + day + '/' + prepareData.birth.split('/')[2];
             // ConfirmModal on, set data
             setPrepareData(prepareData);
+            console.log(prepareData);
         }
     };
     // confirm modal close

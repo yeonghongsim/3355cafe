@@ -349,7 +349,7 @@ export default function HomePage(props) {
         if (userInfo !== null) {
             // console.log('get my boardlist');
             const fetchMyBoardList = async () => {
-                const userId = userInfo._id;
+                const userId = userInfo?._id;
                 let myBoards;
                 try {
                     const fullURL = `http://localhost:8080/myBoardList/${userId}`;

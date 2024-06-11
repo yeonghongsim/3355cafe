@@ -68,8 +68,10 @@ const ProfileImgWrapper = styled.div`
     border-radius: 50%;
 `;
 const ProfileImg = styled.img`
-    width: 65%;
-    height: 65%;
+    // width: 65%;
+    width: ${(props) => (props.$selectedImg ? '100%' : '65%')};
+    // height: 65%;
+    height: ${(props) => (props.$selectedImg ? '100%' : '65%')};
     flex-shrink: 0;
 `;
 const ProfileTextContainer = styled.div`
@@ -96,9 +98,15 @@ const BirthText = styled.span`
 export default function UserInfoPage() {
     const userInfo = useSelector((state) => state.user.user);
     const navigate = useNavigate();
-    const birthYear = userInfo.birth.split('/')[2];
-    const birthMonth = userInfo.birth.split('/')[0];
-    const birthDay = userInfo.birth.split('/')[1];
+    const birthYear = userInfo?.birth.split('/')[2];
+    const birthMonth = userInfo?.birth.split('/')[0];
+    const birthDay = userInfo?.birth.split('/')[1];
+    let selectedImg;
+    if (userInfo?.profileImgURL !== null) {
+        selectedImg = true;
+    } else {
+        selectedImg = false;
+    }
     const moveToHomePage = (path) => {
         navigate(path);
     };
@@ -121,21 +129,25 @@ export default function UserInfoPage() {
                         <ProfileImgContainer>
                             <ProfileImgWrapper>
                                 {
-                                    userInfo.profileImgName === null ?
+                                    userInfo?.profileImgName === null ?
                                         <ProfileImg src="/image/profile.svg"></ProfileImg>
-                                        : null
+                                        : <ProfileImg
+                                            src={userInfo?.profileImgURL}
+                                            alt={userInfo?.profileImgName}
+                                            $selectedImg={selectedImg}
+                                        ></ProfileImg>
                                 }
                             </ProfileImgWrapper>
                         </ProfileImgContainer>
                         <ProfileTextContainer>
-                            <ProfileText>이름 : {userInfo.userName}</ProfileText>
-                            <ProfileText>성별 : {userInfo.gender}</ProfileText>
+                            <ProfileText>이름 : {userInfo?.userName}</ProfileText>
+                            <ProfileText>성별 : {userInfo?.gender}</ProfileText>
                             <ProfileText>생일 :
                                 <BirthText>{birthYear}</BirthText>년
                                 <BirthText>{birthMonth}</BirthText>월
                                 <BirthText>{birthDay}</BirthText>일
                             </ProfileText>
-                            <ProfileText>연락처 : {userInfo.phoneNumber}</ProfileText>
+                            <ProfileText>연락처 : {userInfo?.phoneNumber}</ProfileText>
                         </ProfileTextContainer>
                     </ProfileContainer>
                 </Layer>

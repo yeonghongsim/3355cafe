@@ -80,6 +80,7 @@ export default function UpdateUserInfoModal({
     const navigate = useNavigate();
     const modalRef = useRef(null);
     const userInfo = useSelector((state) => state.user.user);
+    const fetchingUpdateDataRef = useRef(null);
     // 모달 외각 클릭 조작 코드
     useEffect(() => {
         const handleOutsideClick = (e) => {
@@ -99,10 +100,10 @@ export default function UpdateUserInfoModal({
         isOn,
         handleCloseModal
     ]);
-    let fetchingUpdateData;
+    // let fetchingUpdateData;
     useEffect(() => {
         if (whatUpdate === 'logInfo') {
-            fetchingUpdateData = async () => {
+            fetchingUpdateDataRef.current = async () => {
                 const userId = userInfo?._id;
                 try {
                     const response = await fetch(`http://localhost:8080/update/user/${userId}/logInfo`, {
@@ -124,15 +125,63 @@ export default function UpdateUserInfoModal({
                     console.log('Error:', error);
                 }
             };
-        } else {
-            fetchingUpdateData = async () => {
-                console.log(whatUpdate);
-                console.log(prepareData);
+        }
+        if (whatUpdate === 'userInfo') {
+            fetchingUpdateDataRef.current = async () => {
+                console.log('fetching update userInfo start');
+                const userId = userInfo?._id;
+                // try {
+                //     const response = await fetch(`http://localhost:8080/update/user/${userId}/userInfo`, {
+                //         method: "POST",
+                //         headers: {
+                //             'Accept': 'application/json',
+                //             'Content-Type': 'application/json'
+                //         },
+                //         body: JSON.stringify(prepareData),
+                //     });
+                //     if (response.ok) {
+                //         const data = await response.json();
+                //         // console.log(data);
+                //         store.dispatch(setUser(data));
+                //         navigate(`/userInfo`);
+                //     } else {
+                //         console.log('Failed to update data');
+                //     }
+                // } catch (error) {
+                //     console.log('Error:', error);
+                // }
+                fetch(`http://localhost:8080/update/user/${userId}/userInfo`, {
+                    method: "POST",
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(prepareData),
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to update data');
+                        }
+                        return response.json();
+                    })
+                    .then(result => {
+                        // console.log(result.userInfo);
+                        store.dispatch(setUser(result.userInfo));
+                    })
+                    .then(() => {
+                        // console.log('poge move')
+                        navigate(`/userInfo`);
+                    })
+                    .catch(error => {
+                        console.log('Error:', error);
+                    });
             };
         }
     }, [
         whatUpdate,
-        prepareData
+        prepareData,
+        navigate,
+        userInfo
     ]);
     return (
         <Wrapper $isOn={isOn}>
@@ -156,7 +205,7 @@ export default function UpdateUserInfoModal({
                     >취소하기</Btn>
                     <Btn
                         $bgColor={COLORS.blueColor}
-                        onClick={() => fetchingUpdateData()}
+                        onClick={() => fetchingUpdateDataRef.current()}
                     >변경하기</Btn>
                 </BtnContainer>
             </ModalSection>

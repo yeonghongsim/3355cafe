@@ -53,10 +53,13 @@ const ProfileImageWrapper = styled.div`
     align-items: center;
     justify-content: center;
     background-color: #d9d9d9;
+    overflow: hidden;
 `;
 const ProfileImage = styled.img`
-    width: 60%;
-    height: 60%;
+    // width: 60%;
+    width: ${(props) => (props.$selectedImg ? '100%' : '60%')};
+    // height: 60%;
+    height: ${(props) => (props.$selectedImg ? '100%' : '60%')};
     flex-shrink: 1;
 `;
 const ProfileNameContainer = styled.div`
@@ -135,7 +138,12 @@ export default function BarModal({
     const userInfo = useSelector((state) => state.user.user);
     const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     const modalRef = useRef(null);
-
+    let selectedImg;
+    if (userInfo?.profileImgURL !== null) {
+        selectedImg = true;
+    } else {
+        selectedImg = false;
+    }
     useEffect(() => {
         let handleClickOutside;
         if (isOn) {
@@ -167,14 +175,30 @@ export default function BarModal({
                 <ProfileContainer>
                     <ProfileImageContainer>
                         <ProfileImageWrapper>
-                            <ProfileImage src="/image/profile.svg"></ProfileImage>
+                            {
+                                userInfo === null ?
+                                    <ProfileImage
+                                        $selectedImg={false}
+                                        src="/image/profile.svg"
+                                    ></ProfileImage>
+                                    : userInfo?.profileImgURL === null ?
+                                        <ProfileImage
+                                            $selectedImg={selectedImg}
+                                            src="/image/profile.svg"
+                                        ></ProfileImage>
+                                        : <ProfileImage
+                                            $selectedImg={selectedImg}
+                                            src={userInfo?.profileImgURL}
+                                            alt={userInfo?.profileImgName}
+                                        ></ProfileImage>
+                            }
                         </ProfileImageWrapper>
                     </ProfileImageContainer>
                     <ProfileNameContainer>
                         <ProfileName>
                             {
                                 userInfo === null ?
-                                    'Guest' : userInfo.userName
+                                    'Guest' : userInfo?.userName
                             }
                             <ProfileText>님</ProfileText>
                         </ProfileName>

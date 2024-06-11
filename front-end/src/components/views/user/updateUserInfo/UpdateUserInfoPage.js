@@ -85,8 +85,8 @@ const ImgWrapper = styled.div`
     box-sizing: border-box;
 `;
 const Img = styled.img`
-    width: 55%;
-    height: 55%
+    width: ${(props) => (props.$isSelectedImg ? '100%' : '55%')};
+    height: ${(props) => (props.$isSelectedImg ? '100%' : '55%')};
     flex-shrink: 0;
 `;
 const ImgUplodaBtn = styled.div`
@@ -172,6 +172,7 @@ export default function UpdateUserInfoPage() {
     const navigate = useNavigate();
     // get userInfo from store
     const userInfo = useSelector((state) => state.user.user);
+    // console.log(userInfo);
     // refs
     const userIdRef = useRef(null);
     const userPwRef = useRef(null);
@@ -183,8 +184,30 @@ export default function UpdateUserInfoPage() {
     let [isOnErrUserPw, setIsOnErrUserPw] = useState(false);
     let [isOnErrUserName, setIsOnErrUserName] = useState(false);
     let [isOnErrPhoneNumber, setIsOnErrPhoneNumber] = useState(false);
-    // img selected
-    let [isImgSelected, setIsImgSelected] = useState(false);
+    // 회원 이미지 정보로 초기 데이터 세팅
+    let profileImage;
+    if (userInfo?.profileImgURL === null) {
+        profileImage = '/image/profile.svg';
+    } else {
+        profileImage = userInfo?.profileImgURL;
+    }
+    // 선택된 사진 URL
+    let [selectedImg, setSelectedImg] = useState(profileImage);
+    // console.log(selectedImg);
+    // 사진 선택 유무
+    let noneProfileImg;
+    if (profileImage === '/image/profile.svg') {
+        noneProfileImg = false;
+    } else {
+        noneProfileImg = true;
+    }
+    // img selected boolean
+    let [isSelectedImg, setIsSelectedImg] = useState(noneProfileImg);
+    // changed img info
+    let [changedImgInfo, setChangedImgInfo] = useState({
+        profileImgName: userInfo?.profileImgName,
+        profileImgURL: userInfo?.profileImgURL
+    });
     // confirmModal
     let [isOnUpdateModal, setIsOnUpdateModal] = useState(false);
     // whatUpdate ? loginfo or userInfo
@@ -207,20 +230,20 @@ export default function UpdateUserInfoPage() {
         // 숫자,영문 각 최소 하나 이상 포함한 6-15자리
         const idValid = /^(?!.*[!@#$%^&*(),.?":{}|<>])(?!.*[ㄱ-ㅎㅏ-ㅣ가-힣])(?=.*[a-zA-Z])(?=.*\d).{6,15}$/.test(userId);
         if (!idValid) {
-            console.log('부적합');
+            // console.log('부적합');
             setIsOnErrUserId(true);
         } else {
-            console.log('적합');
+            // console.log('적합');
             setIsOnErrUserId(false);
         }
         // 비밀번호
         // 조건 : 숫자,영문,특수기호 각 최소 하나이상 포함 10-20자리
         const pwValid = /^(?=.*[!@#$%^&*(),.?":{}|<>])(?=.*[a-zA-Z])(?=.*\d)(?=\S+$).{10,20}$/.test(userPassword);
         if (!pwValid) {
-            console.log('부적합');
+            // console.log('부적합');
             setIsOnErrUserPw(true);
         } else {
-            console.log('적합');
+            // console.log('적합');
             setIsOnErrUserPw(false);
         }
         if (idValid && pwValid) {
@@ -233,11 +256,13 @@ export default function UpdateUserInfoPage() {
         }
     };
     const handleUpdateUserInfo = () => {
+        const userName = userNameRef.current.value;
+        const phoneNumber = phoneNumberRef.current.value;
         const data = {
-            profileImgURL: null,
-            profileImgName: null,
-            userName: userNameRef.current.value,
-            phoneNumber: phoneNumberRef.current.value,
+            profileImgURL: changedImgInfo.profileImgURL,
+            profileImgName: changedImgInfo.profileImgName,
+            userName: userName,
+            phoneNumber: phoneNumber,
         }
         // console.log(data)
         // 데이터 유효성 검사하기
@@ -247,22 +272,24 @@ export default function UpdateUserInfoPage() {
         // 조건 : 한글만 입력되어 있는지
         const nameValid = /^[가-힣]+$/u.test(data.userName);
         if (!nameValid) {
-            console.log('부적합');
+            // console.log('부적합');
             setIsOnErrUserName(true);
         } else {
-            console.log('적합');
+            // console.log('적합');
             setIsOnErrUserName(false);
         }
         // 연락처
         const phoneNumberValidBefore = /^[0-9]*$/.test(data.phoneNumber);
         const phoneNumberValid = !phoneNumberValidBefore || data.phoneNumber.length !== 8;
         if (phoneNumberValid) {
-            console.log('부적합');
+            // console.log('부적합');
             setIsOnErrPhoneNumber(true);
         } else {
-            console.log('적합');
+            // console.log('적합');
             setIsOnErrPhoneNumber(false);
         }
+        // phoneNumber change XXXXXXXX -> 010-XXXX-XXXX
+        data.phoneNumber = '010-' + data.phoneNumber.slice(0, 4) + '-' + data.phoneNumber.slice(4, 8);
         if (nameValid && !phoneNumberValid) {
             setIsOnUpdateModal(true);
             setWhatUpdate('userInfo');
@@ -274,18 +301,13 @@ export default function UpdateUserInfoPage() {
     };
     // 파일 삭제 및 모든 정보 초기화
     const handleFileRemove = () => {
-        console.log('img file delete btn click');
-        // setSelectedImg('/icons/icon_profile.svg');
-        // setIsImgSelected(false);
-        // setUserProfileImage({
-        //     fileURL: null,
-        //     fileName: null
-        // });
-        // if (userInfo?.profileImgURL === null) {
-        //     setChangeProfileImg(false);
-        // } else {
-        //     setChangeProfileImg(true);
-        // }
+        // console.log('img file delete btn click');
+        setSelectedImg('/image/profile.svg');
+        setIsSelectedImg(false);
+        setChangedImgInfo({
+            profileImgName: null,
+            profileImgURL: null
+        });
     };
     // 이미지 파일 등록 버튼 클릭
     const handleFileClick = () => {
@@ -320,32 +342,26 @@ export default function UpdateUserInfoPage() {
     // 파일 변경 함수
     const handleFileChange = async (e) => {
         const file = e.target.files[0];
-        console.log(file);
-        // if (file) {
-        //     try {
-        //         // 이미지 압축 후 Base64로 인코딩
-        //         const compressedImage = await compressAndEncodeImage(file);
-        //         if (compressedImage) {
-        //             const fileUrl = compressedImage;
-        //             setSelectedImg(fileUrl);
-        //             setIsSelectedImg(true);
-        //             setUserProfileImage({
-        //                 fileURL: fileUrl,
-        //                 fileName: file.name
-        //             });
-        //             if (userInfo.profileImgName === file.name) {
-        //                 setChangeProfileImg(false);
-        //             } else {
-        //                 setChangeProfileImg(true);
-        //             }
-        //         } else {
-        //             // 압축에 실패한 경우에 대한 처리 (예: 알림, 기타 로직 추가)
-        //             console.error('이미지 압축에 실패했습니다.');
-        //         }
-        //     } catch (error) {
-        //         console.error("Error encoding file:", error);
-        //     }
-        // }
+        if (file) {
+            try {
+                // 이미지 압축 후 Base64로 인코딩
+                const compressedImage = await compressAndEncodeImage(file);
+                if (compressedImage) {
+                    const fileUrl = compressedImage;
+                    setSelectedImg(fileUrl);
+                    setIsSelectedImg(true);
+                    setChangedImgInfo({
+                        profileImgName: file.name,
+                        profileImgURL: fileUrl
+                    });
+                } else {
+                    // 압축에 실패한 경우에 대한 처리 (예: 알림, 기타 로직 추가)
+                    console.error('이미지 압축에 실패했습니다.');
+                }
+            } catch (error) {
+                console.error("Error encoding file:", error);
+            }
+        }
     };
     const handleInputFireSpace = (e) => {
         const newValue = e.target.value.replace(/\s+/g, '');
@@ -403,10 +419,14 @@ export default function UpdateUserInfoPage() {
                         <InfoContainer>
                             <ImgContainer>
                                 <ImgWrapper>
-                                    <Img src="/image/profile.svg"></Img>
+                                    <Img
+                                        src={selectedImg}
+                                        alt={userInfo?.profileImgName}
+                                        $isSelectedImg={isSelectedImg}
+                                    ></Img>
                                 </ImgWrapper>
                                 {
-                                    isImgSelected ?
+                                    isSelectedImg ?
                                         <ImgUplodaBtn
                                             onClick={handleFileRemove}
                                             $bgColor="#FF0000"
