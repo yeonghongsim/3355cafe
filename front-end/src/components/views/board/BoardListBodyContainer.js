@@ -2,7 +2,7 @@ import styled from "styled-components"
 import { COLORS } from "../../../commons/styles/COLORS";
 import { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import Spinner from "../../commons/hooks/Spinner";
 import UnLoginAlertModal from "../../commons/modal/UnLoginAlertModal";
@@ -75,7 +75,7 @@ const SearchBarInput = styled.input`
     height: 100%;
     border: none;
     outline: none;
-    padding-left: 0.5rem;
+    padding-left: 1rem;
     border-radius: 0.5rem;
     font-size: 1.6rem;
     font-style: normal;
@@ -228,6 +228,7 @@ export default function BoardListBodyContainer({
 }) {
     // page navigate
     const navigate = useNavigate();
+    const location = useLocation();
     // 목록 조회 전까지의 로딩
     const [isLoading, setIsLoading] = useState(true);
     // 알람 모달 state
@@ -246,7 +247,7 @@ export default function BoardListBodyContainer({
         // console.log($location.split('/'));
         if ($location.split('/').length === 2) {
             // board
-            console.log('board page');
+            // console.log('board page');
             searchInputRef.current.value = '';
             setIsLoading(true);
             const fetchItems = async () => {
@@ -258,7 +259,7 @@ export default function BoardListBodyContainer({
                     setIsLoading(false);
                     // console.log(result);
                 } catch (error) {
-                    console.error('Error getting itemType data:', error);
+                    // console.error('Error getting itemType data:', error);
                     throw error;
                 }
             };
@@ -266,7 +267,7 @@ export default function BoardListBodyContainer({
             fetchItems();
         } else if ($location.split('/')[2] !== 'search') {
             // board/more
-            console.log('board/more page');
+            // console.log('board/more page');
             searchInputRef.current.value = '';
             setIsLoading(true);
             const moreURL = $location.split('/')[2];
@@ -279,15 +280,55 @@ export default function BoardListBodyContainer({
                     setBoardList(result);
                     setIsLoading(false);
                 } catch (error) {
-                    console.error('Error getting itemType data:', error);
+                    // console.error('Error getting itemType data:', error);
                     throw error;
                 }
             };
             // fetchUserItems를 의존성 배열에 추가
             fetchItems();
+        } else {
+            // board/search
+            setIsLoading(true);
+            console.log('board/search page');
+            const searchData = location?.state.searchData;
+            searchInputRef.current.value = searchData;
+            let fetchItems;
+            if (searchData === '') {
+                console.log('value none');
+                fetchItems = async () => {
+                    try {
+                        const fullURL = `http://localhost:8080/boardList`;
+                        const response = await axios.get(fullURL);
+                        const result = await response.data;
+                        setBoardList(result);
+                        setIsLoading(false);
+                        // console.log(result);
+                    } catch (error) {
+                        // console.error('Error getting itemType data:', error);
+                        throw error;
+                    }
+                };
+            } else {
+                console.log('value ok');
+                fetchItems = async () => {
+                    try {
+                        const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
+                        const response = await axios.get(fullURL);
+                        const result = await response.data;
+                        setBoardList(result);
+                        setIsLoading(false);
+                    } catch (error) {
+                        // console.error('Error getting itemType data:', error);
+                        throw error;
+                    }
+                };
+            }
+            // fetchUserItems를 의존성 배열에 추가
+            fetchItems();
         }
     }, [
-        $location
+        $location,
+        location
     ]);
     // click btn, move to register board
     const handleClickResisterBoardBtn = () => {
@@ -295,59 +336,43 @@ export default function BoardListBodyContainer({
     };
     // search input ref get value
     const handleSearchImgClick = async () => {
-        setIsLoading(true);
-        console.log('/board/search page');
-        navigate('/board/search');
+        // setIsLoading(true);
+        // console.log('/board/search page');
         const searchData = searchInputRef.current.value;
-        console.log(searchData);
-        try {
-            const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
-            const response = await axios.get(fullURL);
-            const result = await response.data;
-            setBoardList(result);
-            setIsLoading(false);
-        } catch (error) {
-            console.error('Error getting itemType data:', error);
-            throw error;
-        }
+        navigate(`/board/search`, { state: { searchData: searchData } });
+        // // console.log('searchData : ' + searchData);
+        // try {
+        //     if (searchData === '') {
+        //         const fullURL = `http://localhost:8080/boardList`;
+        //         const response = await axios.get(fullURL);
+        //         const result = await response.data;
+        //         setBoardList(result);
+        //         setIsLoading(false);
+        //     } else {
+        //         const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
+        //         const response = await axios.get(fullURL);
+        //         const result = await response.data;
+        //         setBoardList(result);
+        //         setIsLoading(false);
+        //     }
+        //     const response = await axios.get(fullURL);
+        //     const result = await response.data;
+        //     setBoardList(result);
+        //     setIsLoading(false);
+        // } catch (error) {
+        //     // console.error('Error getting itemType data:', error);
+        //     throw error;
+        // }
     };
-    // click board, update board.views
-    // put userId in board.views
-    // fetching data and page move with state n updated data
+    // click board
     const handleClickBoard = (board) => {
         if (userInfo === null) {
             setIsOnAlertModal(true);
         } else {
-            handleUpdateBoardViews(board)
+            moveToBoardDetailPage(board);
         }
     };
-    const handleUpdateBoardViews = async (board) => {
-        // navigate(`/boardDetail/${board._id}`, { state: { board } });
-        // if (!board.views.includes(userInfo._id)) {
-        //     board.views.push(userInfo._id);
-        // }
-        // try {
-        //     const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
-        //         method: "POST",
-        //         headers: {
-        //             'Accept': 'application/json',
-        //             'Content-Type': 'application/json'
-        //         },
-        //         body: JSON.stringify(board),
-        //     });
-
-        //     if (response.ok) {
-        //         const data = await response.json();
-        //         const board = data.board;
-        //         const boardId = board._id;
-        //         // console.log(data.board);
-        //         navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
-        //     } else {
-        //         console.log('Failed to update data');
-        //     }
-        // } catch (error) {
-        //     console.log('Error:', error);
-        // }
+    const moveToBoardDetailPage = async (board) => {
         navigate(`/boardDetail/${board._id}`, { state: { board } });
     };
 

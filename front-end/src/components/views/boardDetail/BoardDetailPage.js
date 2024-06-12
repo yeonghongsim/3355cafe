@@ -217,7 +217,6 @@ export default function BoardDetailPage() {
                     if (response.ok) {
                         const data = await response.json();
                         const result = data.board;
-                        // console.log(result);
                         setBoardLikeList(result.likeList);
                         setBoardUnlikeList(result.unLikeList);
                         setBoard(result);
@@ -251,48 +250,6 @@ export default function BoardDetailPage() {
             };
             fetchingBoardDetail();
         }
-        // const handleUpdateBoardViews = async () => {
-        //     console.log('update board views')
-        //     const beforeBoard = propsBoard;
-        //     console.log(beforeBoard);
-        //     try {
-        //         if (!beforeBoard.views.includes(userInfo._id)) {
-        //             beforeBoard.views.push(userInfo._id);
-        //         }
-        //         const response = await fetch('http://localhost:8080/update/board/addUseridInViews', {
-        //             method: "POST",
-        //             headers: {
-        //                 'Accept': 'application/json',
-        //                 'Content-Type': 'application/json'
-        //             },
-        //             body: JSON.stringify(beforeBoard),
-        //         });
-        //         if (response.ok) {
-        //             console.log('success to update data');
-        //         } else {
-        //             console.log('Failed to update data');
-        //         }
-        //     } catch (error) {
-        //         console.log('Error:', error);
-        //     }
-        // };
-        // handleUpdateBoardViews();
-        // const fetchingBoardDetail = async () => {
-        //     try {
-        //         const boardId = propsBoard._id;
-        //         const fullURL = `http://localhost:8080/boardDetail/${boardId}`;
-        //         const response = await axios.get(fullURL);
-        //         const result = await response.data;
-        //         setBoardLikeList(result.likeList);
-        //         setBoardUnlikeList(result.unLikeList);
-        //         setBoard(result);
-        //         setIsLoading(false);
-        //     } catch (error) {
-        //         console.error('Error getting board detail data:', error);
-        //         throw error;
-        //     }
-        // };
-        // fetchingBoardDetail();
     }, [
         propsBoard,
         userInfo

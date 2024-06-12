@@ -184,9 +184,8 @@ app.get('/boardList', async function (req, res) {
 // board list get
 app.get('/boardList/:moreURL', async function (req, res) {
     try {
-        console.log('get boardList start');
+        console.log('get moreURL boardList start');
         const moreURL = req.params.moreURL;
-        console.log(moreURL);
 
         const result = await db.collection('board').find(
             { boardTypeValue: moreURL }
@@ -200,14 +199,13 @@ app.get('/boardList/:moreURL', async function (req, res) {
 // board list get by searchData
 app.get('/boardList/search/:searchData', async function (req, res) {
     try {
-        console.log('get boardList start');
+        console.log('get search boardList start');
         const searchData = req.params.searchData;
-        console.log(`<p>${searchData}</p>`);
+        console.log(searchData);
 
-        const result = await db.collection('board').find({}).toArray();
-        // const result = await db.collection('board').find({
-        //     contentHTML: `<p>${searchData}</p>`
-        // }).toArray();
+        const result = await db.collection('board').find({
+            boardTitle: { $regex: searchData, $options: 'i' }
+        }).toArray();
         res.status(200).json(result);
     } catch (error) {
         console.error('Error getting boardList data:', error);
