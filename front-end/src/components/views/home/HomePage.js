@@ -2,13 +2,14 @@ import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 import axios from "axios";
 import store from "../../../commons/store/store";
 import { setBoardTypeList } from "../../../commons/store/boardTypeList";
 import { setMyBoardList } from "../../../commons/store/myBoardList";
 import { setUser } from "../../../commons/store/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -252,9 +253,57 @@ const BodyContainerRight = styled.div`
 const BodyContainerRightSmall = styled.div`
     width: 100%;
     height: 50%;
-    // background-color: ${props => props.$bgColor};
+    // padding: 1rem;
+    box-sizing: border-box;
+`;
+const RecentBoardListFullContainer = styled.div`
+    width: 100%;
+    height: 100%;
     padding: 1rem;
     box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 1rem;
+`;
+const RecentBoardListHeadContainer = styled.div`
+    width: 100%;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+`;
+const RecentBoardListHeadText = styled.p`
+    font-size: 1.8rem;
+    font-weight: bold;
+    margin: 0;
+    color: black;
+`;
+const RecentBoardListContainer = styled.div`
+    width: 100%;
+    height: calc(100% - 2rem);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+`;
+const RecentBoard = styled.div`
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+`;
+const RecentBoardText = styled.p`
+    font-size: 1.6rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    &:hover {
+        cursor: pointer;
+        text-decoration: underline;
+    }
 `;
 const FooterSection = styled.section`
     width: 100%;
@@ -316,6 +365,8 @@ const FooterText = styled.p`
 `;
 
 export default function HomePage(props) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     // userInfo section
     let userInfo = useSelector((state) => state.user.user);
     // get boardTypeList in store
@@ -345,6 +396,14 @@ export default function HomePage(props) {
         boardTypeList
     ]);
     const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
+    // 두 배열이 동일한지 확인하는 함수
+    const arraysEqual = (arr1, arr2) => {
+        if (arr1.length !== arr2.length) return false;
+        for (let i = 0; i < arr1.length; i++) {
+            if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) return false;
+        }
+        return true;
+    };
     useEffect(() => {
         if (userInfo !== null) {
             // console.log('get my boardlist');
@@ -358,8 +417,20 @@ export default function HomePage(props) {
                     // console.log(myBoards);
                     // setMyBoardList(myBoards);
                     // store.dispatch(setMyBoardList(myBoards));
-                    if (myBoardList.length !== myBoards.length) {
-                        store.dispatch(setMyBoardList(myBoards));
+                    // 수정 필요하다!!!!!!!!!!!!!!!!!!!!!!!
+                    // 현재 코드는 길이만을 비교하기 때문에
+                    // 만약 게시글을 삭제하고 등록했을 경우
+                    // 길이의 변화는 없지만, 게시글 내용의 변화는 있다.
+                    // 즉 다른 비교법을 갖고 와야 한다.
+                    // 기존 내가 사용한 코드
+                    // if (myBoardList.length !== myBoards.length) {
+                    //     store.dispatch(setMyBoardList(myBoards));
+                    // }
+                    // 수정 완.
+                    // 지피티 코드
+                    // 배열의 내용을 비교하여 동일하지 않으면 상태를 업데이트
+                    if (!arraysEqual(myBoardList, myBoards)) {
+                        dispatch(setMyBoardList(myBoards));
                     }
                 } catch (error) {
                     console.error('Error getting itemType data:', error);
@@ -372,6 +443,7 @@ export default function HomePage(props) {
     }, [
         myBoardList
         , userInfo
+        , dispatch
     ])
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
@@ -457,6 +529,21 @@ export default function HomePage(props) {
         e.stopPropagation();
         adImageResetInterval();
     };
+    // login page 이동
+    const moveToPage = (path, board) => {
+        // navigate(path);
+        const prevPathname = '/';
+        navigate(path, { state: { board, prevPathname } });
+    };
+    // localstorage 사용해서 최근 본 게시글 목록 사용할 예정
+    const [recentBoardList, setRecentBoardList] = useState([]);
+    useEffect(() => {
+        if (userInfo) {
+            const userKey = `recentBoards_${userInfo._id}`;
+            const recentBoards = JSON.parse(localStorage.getItem(userKey)) || [];
+            setRecentBoardList(recentBoards);
+        }
+    }, [userInfo]);
 
     return (
         <Wrapper>
@@ -565,10 +652,40 @@ export default function HomePage(props) {
                             </AdImageListFullContainer>
                         </BodyContainerLeft>
                         <BodyContainerRight>
-                            <BodyContainerRightSmall $bgColor="lightblue">
-                                오늘의 핫이슈
+                            <BodyContainerRightSmall>
+                                <RecentBoardListFullContainer>
+                                    <RecentBoardListHeadContainer>
+                                        <RecentBoardListHeadText>
+                                            최근 본 게시글
+                                        </RecentBoardListHeadText>
+                                    </RecentBoardListHeadContainer>
+                                    {
+                                        userInfo === null ?
+                                            <RecentBoardText onClick={() => moveToPage('/login', null)}>
+                                                회원 전용 서비스 입니다. 로그인 하러 가시겠습니까?
+                                            </RecentBoardText> :
+                                            <RecentBoardListContainer>
+                                                {
+                                                    recentBoardList.length === 0 ?
+                                                        <RecentBoardText>
+                                                            최근 본 게시글이 없습니다.
+                                                        </RecentBoardText> :
+                                                        recentBoardList.map((board, i) => (
+                                                            <RecentBoard
+                                                                key={i}
+                                                            >
+                                                                <RecentBoardText
+                                                                    onClick={() => moveToPage(`/boardDetail/${board._id}`, board)}>
+                                                                    {board.boardTitle}
+                                                                </RecentBoardText>
+                                                            </RecentBoard>
+                                                        ))
+                                                }
+                                            </RecentBoardListContainer>
+                                    }
+                                </RecentBoardListFullContainer>
                             </BodyContainerRightSmall>
-                            <BodyContainerRightSmall $bgColor="lightyellow">
+                            <BodyContainerRightSmall>
                                 이미지 파일들(ppt, video) 다운로드
                             </BodyContainerRightSmall>
                         </BodyContainerRight>

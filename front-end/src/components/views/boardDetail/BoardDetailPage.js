@@ -193,13 +193,36 @@ export default function BoardDetailPage() {
     const location = useLocation();
     // 목록 조회 전까지의 로딩
     const [isLoading, setIsLoading] = useState(true);
+    // 유저 정보 from store
     const userInfo = useSelector((state) => state.user.user);
+    // navigate 에서 전달한 state
     const propsBoard = location.state?.board;
+    // 사용될 게시글 통
     let [board, setBoard] = useState();
+    // 좋아요를 조작할 스위치
     let [boardLikeList, setBoardLikeList] = useState([]);
+    // 싫어요를 조작할 스위치
     let [boardUnlikeList, setBoardUnlikeList] = useState([]);
+    // 글.조회수에 따라 달라질 게시글 정보
     useEffect(() => {
+        // 게시글 정보 조회 후 실행될 코드
+        const recentBoardControl = (board) => {
+            // console.log('최근 본 게시글 조작');
+            const userKey = `recentBoards_${userInfo._id}`;
+            const recentBoards = JSON.parse(localStorage.getItem(userKey)) || [];
+            // 이미 존재하는 게시글이면 제거
+            const updatedBoards = recentBoards.filter(storedBoard => storedBoard._id !== board._id);
+            // 새로운 게시글 추가
+            updatedBoards.unshift(board);
+            // 최대 5개까지만 저장
+            if (updatedBoards.length > 5) {
+                updatedBoards.pop();
+            }
+            // 유저별로 저장
+            localStorage.setItem(userKey, JSON.stringify(updatedBoards));
+        };
         let beforeBoard = propsBoard;
+        // 사용자가 최초로 보는 게시글일 경우
         if (!beforeBoard.views.includes(userInfo._id)) {
             // console.log('views에 userId 추가 후 update 쿼리 실행')
             beforeBoard.views.push(userInfo._id);
@@ -221,7 +244,8 @@ export default function BoardDetailPage() {
                         setBoardUnlikeList(result.unLikeList);
                         setBoard(result);
                         setIsLoading(false);
-                        // navigate(`/boardDetail/${data.board._id}`, { state: { boardId } });
+                        // localstorage에 글 정보 저장
+                        recentBoardControl(result);
                     } else {
                         console.log('Failed to update data');
                     }
@@ -230,7 +254,9 @@ export default function BoardDetailPage() {
                 }
             };
             fetchingAddUserIdInBoardViews();
-        } else {
+        }
+        // 사용자가 이미 본 게시글일 경우
+        else {
             // console.log('get 쿼리 실행')
             // get board detail
             const fetchingBoardDetail = async () => {
@@ -243,6 +269,8 @@ export default function BoardDetailPage() {
                     setBoardUnlikeList(result.unLikeList);
                     setBoard(result);
                     setIsLoading(false);
+                    // localstorage에 글 정보 저장
+                    recentBoardControl(result);
                 } catch (error) {
                     console.error('Error getting board detail data:', error);
                     throw error;
@@ -366,7 +394,6 @@ export default function BoardDetailPage() {
             console.log('Error:', error);
         }
     };
-    // localstorage 사용해서 홈페이지에서 최근 본 게시글 목록 조회할 예정
 
     return (
         <Wrapper>
