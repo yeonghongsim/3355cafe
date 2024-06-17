@@ -244,9 +244,7 @@ export default function BoardListBodyContainer({
     const searchInputRef = useRef(null);
     // fetching board list
     useEffect(() => {
-        // console.log($location.split('/'));
         if ($location.split('/').length === 2) {
-            // board
             // console.log('board page');
             searchInputRef.current.value = '';
             setIsLoading(true);
@@ -266,7 +264,6 @@ export default function BoardListBodyContainer({
             // fetchUserItems를 의존성 배열에 추가
             fetchItems();
         } else if ($location.split('/')[2] !== 'search') {
-            // board/more
             // console.log('board/more page');
             searchInputRef.current.value = '';
             setIsLoading(true);
@@ -287,9 +284,8 @@ export default function BoardListBodyContainer({
             // fetchUserItems를 의존성 배열에 추가
             fetchItems();
         } else {
-            // board/search
             setIsLoading(true);
-            console.log('board/search page');
+            // console.log('board/search page');
             const searchData = location?.state.searchData;
             searchInputRef.current.value = searchData;
             let fetchItems;
@@ -309,7 +305,7 @@ export default function BoardListBodyContainer({
                     }
                 };
             } else {
-                console.log('value ok');
+                // console.log('value ok');
                 fetchItems = async () => {
                     try {
                         const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
@@ -336,33 +332,8 @@ export default function BoardListBodyContainer({
     };
     // search input ref get value
     const handleSearchImgClick = async () => {
-        // setIsLoading(true);
-        // console.log('/board/search page');
         const searchData = searchInputRef.current.value;
         navigate(`/board/search`, { state: { searchData: searchData } });
-        // // console.log('searchData : ' + searchData);
-        // try {
-        //     if (searchData === '') {
-        //         const fullURL = `http://localhost:8080/boardList`;
-        //         const response = await axios.get(fullURL);
-        //         const result = await response.data;
-        //         setBoardList(result);
-        //         setIsLoading(false);
-        //     } else {
-        //         const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
-        //         const response = await axios.get(fullURL);
-        //         const result = await response.data;
-        //         setBoardList(result);
-        //         setIsLoading(false);
-        //     }
-        //     const response = await axios.get(fullURL);
-        //     const result = await response.data;
-        //     setBoardList(result);
-        //     setIsLoading(false);
-        // } catch (error) {
-        //     // console.error('Error getting itemType data:', error);
-        //     throw error;
-        // }
     };
     // click board
     const handleClickBoard = (board) => {
@@ -373,7 +344,9 @@ export default function BoardListBodyContainer({
         }
     };
     const moveToBoardDetailPage = async (board) => {
-        navigate(`/boardDetail/${board._id}`, { state: { board } });
+        const prevPathname = location.pathname;
+        const searchData = searchInputRef.current.value;
+        navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData } });
     };
 
     return (

@@ -269,7 +269,10 @@ export default function BoardDetailPage() {
         }, 1000);
     }, []);
     const handlePageBack = () => {
-        navigate('/board');
+        // 이전 페이지와 검색페이지 일 경우 검색어 기억하기
+        const prevPathname = location?.state.prevPathname;
+        const searchData = location?.state.searchData;
+        navigate(prevPathname, { state: { searchData } });
     };
     const handleLikeClick = async (board) => {
         // console.log('like btn click');
