@@ -366,6 +366,7 @@ export default function BoardDetailPage() {
             console.log('Error:', error);
         }
     };
+    // localstorage 사용해서 홈페이지에서 최근 본 게시글 목록 조회할 예정
 
     return (
         <Wrapper>
