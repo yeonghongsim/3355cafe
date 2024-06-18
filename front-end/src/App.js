@@ -23,6 +23,7 @@ import Test503 from './components/views/test/Test503';
 import Test6RegiBoard from './components/views/test/Test6RegiBoard';
 import Test6GetBoardList from './components/views/test/Test6GetBoardList';
 import Test6GetBoard from './components/views/test/Test6GetBoard';
+import Text7Checkbox from './components/views/test/Text7Checkbox';
 import { useSelector } from 'react-redux';
 
 
@@ -70,6 +71,7 @@ function App() {
           <Route path='2' element={< Test6GetBoardList />}></Route>
           <Route path='3' element={< Test6GetBoard />}></Route>
         </Route>
+        <Route path='/test7' element={< Text7Checkbox />}></Route>
       </Routes>
     </Wrapper>
   );

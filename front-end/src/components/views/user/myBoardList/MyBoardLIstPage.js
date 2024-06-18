@@ -45,7 +45,7 @@ const CheckBoxContainer = styled.div`
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: ${(props) => (props.$border ? '0.1rem solid #d9d9d9' : 'none')};
+    border-right: ${(props) => (props.$borderRight ? '0.1rem solid #d9d9d9' : 'none')};
     box-sizing: border-box;
 `;
 const ElseCheckBoxContainer = styled.div`
@@ -129,10 +129,10 @@ export default function MyBoardLIstPage() {
                 <LOGO></LOGO>
                 <BoardListContainer>
                     <Layer $border={false}>
-                        <CheckBoxContainer $border={false}>chkall</CheckBoxContainer>
+                        <CheckBoxContainer $borderRight={false}>chkall</CheckBoxContainer>
                         <ElseCheckBoxContainer>
                             <DeleteBtnContainer>
-                                <BeleteBtn $bgColor="#FFA27F">선택 삭제</BeleteBtn>
+                                <BeleteBtn $bgColor="#686D76">선택 삭제</BeleteBtn>
                                 <BeleteBtn $bgColor="#FF0000">전체 삭제</BeleteBtn>
                             </DeleteBtnContainer>
                         </ElseCheckBoxContainer>
@@ -146,7 +146,7 @@ export default function MyBoardLIstPage() {
                                     $border={true}
                                 >
                                     <CheckBoxContainer
-                                        $border={true}
+                                        $borderRight={true}
                                     >chkbox</CheckBoxContainer>
                                     <ElseCheckBoxContainer>
                                         <BoardContainer>
