@@ -337,6 +337,29 @@ app.post('/update/user/:userId/userInfo', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// delete myboardlist
+app.delete('/delete/myBoardList', async function (req, res) {
+    try {
+        console.log('start delete user myboardList');
+        const boardIdList = req.body.whatDeleteBoardList;
+        // boardIdList의 문자열 아이디들을 ObjectId로 변환합니다
+        const objectIdList = boardIdList.map(id => ObjectId(id));
+        const userId = req.body.userId;
+        // 삭제 쿼리
+        await db.collection('board').deleteMany({
+            _id: { $in: objectIdList },
+        });
+        // 재 조회 후 전달
+        const boardList = await db.collection('board').find({
+            userPrimeId: userId
+        }).toArray();
+        res.status(200).json({ message: 'Boards deleted successfully', boardList });
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 
 // --- test6 관련
 // wysiwyg post

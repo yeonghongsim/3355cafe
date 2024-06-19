@@ -2,12 +2,11 @@ import styled from "styled-components"
 import LOGO from "../../commons/logo/LOGO";
 import BarModal from "../../commons/modal/BarModal";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import OnClickMoveToPage from "../../commons/hooks/OnClickMoveToPage";
 import axios from "axios";
 import store from "../../../commons/store/store";
 import { setBoardTypeList } from "../../../commons/store/boardTypeList";
-import { setMyBoardList } from "../../../commons/store/myBoardList";
 import { setUser } from "../../../commons/store/userSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -365,7 +364,6 @@ const FooterText = styled.p`
 `;
 
 export default function HomePage(props) {
-    const dispatch = useDispatch();
     const navigate = useNavigate();
     // userInfo section
     let userInfo = useSelector((state) => state.user.user);
@@ -395,56 +393,6 @@ export default function HomePage(props) {
     }, [
         boardTypeList
     ]);
-    const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
-    // 두 배열이 동일한지 확인하는 함수
-    const arraysEqual = (arr1, arr2) => {
-        if (arr1.length !== arr2.length) return false;
-        for (let i = 0; i < arr1.length; i++) {
-            if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) return false;
-        }
-        return true;
-    };
-    useEffect(() => {
-        if (userInfo !== null) {
-            // console.log('get my boardlist');
-            const fetchMyBoardList = async () => {
-                const userId = userInfo?._id;
-                let myBoards;
-                try {
-                    const fullURL = `http://localhost:8080/myBoardList/${userId}`;
-                    const response = await axios.get(fullURL);
-                    myBoards = await response.data;
-                    // console.log(myBoards);
-                    // setMyBoardList(myBoards);
-                    // store.dispatch(setMyBoardList(myBoards));
-                    // 수정 필요하다!!!!!!!!!!!!!!!!!!!!!!!
-                    // 현재 코드는 길이만을 비교하기 때문에
-                    // 만약 게시글을 삭제하고 등록했을 경우
-                    // 길이의 변화는 없지만, 게시글 내용의 변화는 있다.
-                    // 즉 다른 비교법을 갖고 와야 한다.
-                    // 기존 내가 사용한 코드
-                    // if (myBoardList.length !== myBoards.length) {
-                    //     store.dispatch(setMyBoardList(myBoards));
-                    // }
-                    // 수정 완.
-                    // 지피티 코드
-                    // 배열의 내용을 비교하여 동일하지 않으면 상태를 업데이트
-                    if (!arraysEqual(myBoardList, myBoards)) {
-                        dispatch(setMyBoardList(myBoards));
-                    }
-                } catch (error) {
-                    console.error('Error getting itemType data:', error);
-                    throw error;
-                }
-            };
-            // fetchUserItems를 의존성 배열에 추가
-            fetchMyBoardList();
-        }
-    }, [
-        myBoardList
-        , userInfo
-        , dispatch
-    ])
     // bar modal section
     let [isOnBarModal, setIsOnBarModal] = useState(false);
     // up-right side bar modal open/close

@@ -3,8 +3,10 @@ import styled from "styled-components"
 import LoginBtn from "../button/LoginBtn";
 import SignupBtn from "../button/SignupBtn";
 import LogoutBtn from "../button/LogoutBtn";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { setMyBoardList } from "../../../commons/store/myBoardList";
+import axios from "axios";
 
 const Wrapper = styled.div`
     width: 25rem;
@@ -135,6 +137,7 @@ export default function BarModal({
     , handleModalClose
 }) {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const userInfo = useSelector((state) => state.user.user);
     const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     const modalRef = useRef(null);
@@ -168,6 +171,42 @@ export default function BarModal({
     const moveToMyBoardListPage = (myBoardList) => {
         navigate('/myBoardList', { state: { myBoardList } });
     };
+
+    // 두 배열이 동일한지 확인하는 함수
+    const arraysEqual = (arr1, arr2) => {
+        if (arr1.length !== arr2.length) return false;
+        for (let i = 0; i < arr1.length; i++) {
+            if (JSON.stringify(arr1[i]) !== JSON.stringify(arr2[i])) return false;
+        }
+        return true;
+    };
+    useEffect(() => {
+        if (userInfo !== null) {
+            // console.log('get my boardlist');
+            const fetchMyBoardList = async () => {
+                const userId = userInfo?._id;
+                let myBoards;
+                try {
+                    const fullURL = `http://localhost:8080/myBoardList/${userId}`;
+                    const response = await axios.get(fullURL);
+                    myBoards = await response.data;
+                    // 지피티 코드
+                    // 배열의 내용을 비교하여 동일하지 않으면 상태를 업데이트
+                    if (!arraysEqual(myBoardList, myBoards)) {
+                        dispatch(setMyBoardList(myBoards));
+                    }
+                } catch (error) {
+                    console.error('Error getting itemType data:', error);
+                    throw error;
+                }
+            };
+            fetchMyBoardList();
+        }
+    }, [
+        myBoardList
+        , userInfo
+        , dispatch
+    ])
 
     return (
         <Wrapper $isOn={isOn} ref={modalRef}>

@@ -4,7 +4,9 @@ import LOGO from "../../../commons/logo/LOGO";
 import CheckBoxWrapper01 from "../../../commons/input/CheckBoxWrapper01";
 import CheckBoxWrapper02 from "../../../commons/input/CheckBoxWrapper02";
 import NoCheckedBoardModal from "../../../commons/modal/NoCheckedBoardModal";
-import { useEffect, useState } from "react";
+import DeleteMyBoardModal from "../../../commons/modal/DeleteMyBoardModal";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -25,7 +27,7 @@ const BodySection = styled.section`
     align-items: flex-start;
     justify-content: flex-start;
 `;
-const BoardListContainer = styled.div`
+const BoardListFullContainer = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -34,6 +36,28 @@ const BoardListContainer = styled.div`
     gap: 0.15rem;
     padding-top: 1.5rem;
     box-sizing: border-box;
+`;
+const BoardListContainer = styled.div`
+    width: 100%;
+    height: 52rem;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    margin-top: 1rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    overflow: hidden;
+`;
+const BoardListWrapper = styled.div`
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    flex: 1;
+    // 얇게
+    scrollbar-width: thin;
+    // 색상
+    scrollbar-color: #666 #eee;
 `;
 const Layer = styled.div`
     width: 100%;
@@ -87,13 +111,6 @@ const BoardTitleWrapper = styled.div`
     // padding-left: 0.2rem;
     // box-sizing: border-box;
 `;
-const PageNationContainer = styled.div`
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
 const Text = styled.p`
     font-size: 1.6rem;
     font-weight: normal;
@@ -127,11 +144,18 @@ const BeleteBtn = styled.div`
 
 export default function MyBoardLIstPage() {
     const location = useLocation();
+    const userInfo = useSelector((state) => state.user.user);
     const myBoardList = location?.state.myBoardList;
+    const [whatDeleteBoardList, setWhatDeleteBoardList] = useState([]);
+    // console.log(myBoardList);
     const [checkInfoList, setCheckInfoList] = useState([]);
     const [isOnModal, setIsOnModal] = useState(false);
+    const [isOnDeleteModal, setIsOnDeleteModal] = useState(false);
     const handleModalClose = () => {
         setIsOnModal(false);
+    };
+    const handleDeleteModalClose = () => {
+        setIsOnDeleteModal(false);
     };
     useEffect(() => {
         const initializeCheckBoxList = async () => {
@@ -151,14 +175,16 @@ export default function MyBoardLIstPage() {
         if (checkedBoardList.length === 0) {
             setIsOnModal(true);
         } else {
-            const boardIdList = checkedBoardList.map((board) => board._id);
-            console.log(boardIdList);
-            console.log('삭제 쿼리 시작');
+            setWhatDeleteBoardList(checkedBoardList.map((board) => board._id));
+            // 삭제 전 확인 질문
+            setIsOnDeleteModal(true);
+            // fetchBoardTypeList(boardIdList, userId);
         }
     };
     const handleRemoveAllBoard = () => {
-        console.log('remove all');
-        console.log('삭제 쿼리 시작');
+        setWhatDeleteBoardList(checkInfoList.map((info) => info._id));
+        setIsOnDeleteModal(true);
+        // fetchBoardTypeList(boardIdList, userId);
     };
     const [allCheckBox, setAllCheckBox] = useState(false);
     const handleAllCheckBox = () => {
@@ -190,11 +216,33 @@ export default function MyBoardLIstPage() {
             setAllCheckBox(false);
         }
     };
+    const listWrapperRef = useRef(null);
+    useEffect(() => {
+        const handleScroll = (event) => {
+            const element = listWrapperRef.current;
+            if (!element) return;
+
+            const isAtTop = element.scrollTop === 0;
+            const isAtBottom = element.scrollTop + element.clientHeight >= element.scrollHeight;
+
+            if ((isAtTop && event.deltaY < 0) || (isAtBottom && event.deltaY > 0)) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+        };
+
+        const element = listWrapperRef.current;
+        element.addEventListener('wheel', handleScroll, { passive: false });
+        return () => {
+            element.removeEventListener('wheel', handleScroll);
+        };
+    }, []);
+
     return (
         <Wrapper>
             <BodySection>
                 <LOGO></LOGO>
-                <BoardListContainer>
+                <BoardListFullContainer>
                     <Layer $border={false}>
                         <CheckBoxContainer $borderRight={false}>
                             <CheckBoxWrapper01
@@ -216,46 +264,53 @@ export default function MyBoardLIstPage() {
                             </DeleteBtnContainer>
                         </ElseCheckBoxContainer>
                     </Layer>
-                    {
-                        myBoardList.length === 0 ?
-                            'not found board' :
-                            myBoardList.map((board, i) =>
-                                <Layer
-                                    key={i}
-                                    $border={true}
-                                >
-                                    <CheckBoxContainer $borderRight={true}>
-                                        <CheckBoxWrapper02
-                                            index={i}
-                                            id={`chkBox${i}`}
-                                            name={`chkBox${i}`}
-                                            checkInfo={checkInfoList[i]}
-                                            handleEachCheckBox={handleEachCheckBox}
-                                        ></CheckBoxWrapper02>
-                                    </CheckBoxContainer>
-                                    <ElseCheckBoxContainer>
-                                        <BoardContainer>
-                                            <BoardTypeWrapper>
-                                                <Text>{board.boardTypeName}</Text>
-                                            </BoardTypeWrapper>
-                                            <BoardTitleWrapper>
-                                                <Text>{board.boardTitle}</Text>
-                                            </BoardTitleWrapper>
-                                        </BoardContainer>
-                                    </ElseCheckBoxContainer>
-                                </Layer>
-                            )
-
-                    }
-                    <Layer $border={false}>
-                        <PageNationContainer>page number</PageNationContainer>
-                    </Layer>
-                </BoardListContainer>
+                    <BoardListContainer>
+                        <BoardListWrapper ref={listWrapperRef}>
+                            {
+                                myBoardList.length === 0 ?
+                                    'not found board' :
+                                    myBoardList.map((board, i) =>
+                                        <Layer
+                                            key={i}
+                                            $border={true}
+                                        >
+                                            <CheckBoxContainer $borderRight={true}>
+                                                <CheckBoxWrapper02
+                                                    index={i}
+                                                    id={`chkBox${i}`}
+                                                    name={`chkBox${i}`}
+                                                    checkInfo={checkInfoList[i]}
+                                                    handleEachCheckBox={handleEachCheckBox}
+                                                ></CheckBoxWrapper02>
+                                            </CheckBoxContainer>
+                                            <ElseCheckBoxContainer>
+                                                <BoardContainer>
+                                                    <BoardTypeWrapper>
+                                                        <Text>{board.boardTypeName}</Text>
+                                                    </BoardTypeWrapper>
+                                                    <BoardTitleWrapper>
+                                                        <Text>{board.boardTitle}</Text>
+                                                    </BoardTitleWrapper>
+                                                </BoardContainer>
+                                            </ElseCheckBoxContainer>
+                                        </Layer>
+                                    )
+                            }
+                        </BoardListWrapper>
+                    </BoardListContainer>
+                </BoardListFullContainer>
             </BodySection>
             <NoCheckedBoardModal
                 isOn={isOnModal}
                 handleModalClose={handleModalClose}
             ></NoCheckedBoardModal>
+            <DeleteMyBoardModal
+                isOn={isOnDeleteModal}
+                handleModalClose={handleDeleteModalClose}
+                userId={userInfo._id}
+                whatDeleteBoardList={whatDeleteBoardList}
+            >
+            </DeleteMyBoardModal>
         </Wrapper>
     )
 }
