@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import Spinner from "../../commons/hooks/Spinner";
 import { setUser } from "../../../commons/store/userSlice";
+import DeleteMyBoardModal from "../../commons/modal/DeleteMyBoardModal";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -72,12 +73,12 @@ const BarImage = styled.img`
     width: 50%;
     height: 50%;
 `;
-const BackTextContainer = styled.div`
+const BackTextnBtnContainer = styled.div`
     width: 100%;
     height: 4rem;
     display: flex;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: ${(props) => (props.$justifyContent)};
 `;
 const BackText = styled.p`
     font-size: 1.8rem;
@@ -87,6 +88,29 @@ const BackText = styled.p`
     &:hover {
         cursor: pointer;
         text-decoration: underline;
+    }
+`;
+const BtnContainer = styled.div`
+    min-width: 1rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+`;
+const Btn = styled.div`
+    width: 9rem;
+    height: 3rem;
+    background-color: ${(props) => (props.$bgColor)};
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: white;
+    border-radius: 0.5rem;
+    &:hover {
+        cursor: pointer;
     }
 `;
 const BodySection = styled.section`
@@ -394,6 +418,17 @@ export default function BoardDetailPage() {
             console.log('Error:', error);
         }
     };
+    const [whatDeleteBoardList, setWhatDeleteBoardList] = useState([]);
+    const [isOnDeleteModal, setIsOnDeleteModal] = useState(false);
+    const handleDeleteModalClose = () => {
+        setIsOnDeleteModal(false);
+    };
+    const handleRemoveBoard = () => {
+        setIsOnDeleteModal(true);
+        const copy = whatDeleteBoardList;
+        copy.push(board?._id);
+        setWhatDeleteBoardList(copy);
+    };
 
     return (
         <Wrapper>
@@ -423,9 +458,38 @@ export default function BoardDetailPage() {
                     {
                         isLoading ? <Spinner></Spinner> :
                             <>
-                                <BackTextContainer>
-                                    <BackText onClick={() => handlePageBack()}>뒤로 가기</BackText>
-                                </BackTextContainer>
+                                <BackTextnBtnContainer
+                                    $justifyContent={
+                                        userInfo?._id === board?.userPrimeId ?
+                                            'space-between' : 'flex-end'
+                                    }
+                                >
+                                    {
+                                        userInfo?._id === board?.userPrimeId ?
+                                            <>
+                                                <BackText onClick={() => handlePageBack()}>
+                                                    뒤로 가기
+                                                </BackText>
+                                                <BtnContainer>
+                                                    <Btn $bgColor="#0E46A3">수정하기</Btn>
+                                                    <Btn
+                                                        $bgColor="red"
+                                                        onClick={() => handleRemoveBoard()}>
+                                                        삭제하기
+                                                    </Btn>
+                                                    <DeleteMyBoardModal
+                                                        isOn={isOnDeleteModal}
+                                                        handleModalClose={handleDeleteModalClose}
+                                                        userId={userInfo._id}
+                                                        whatDeleteBoardList={whatDeleteBoardList}
+                                                    ></DeleteMyBoardModal>
+                                                </BtnContainer>
+                                            </> :
+                                            <BackText onClick={() => handlePageBack()}>
+                                                뒤로 가기
+                                            </BackText>
+                                    }
+                                </BackTextnBtnContainer>
                                 <BoardInfoSection>
                                     <BoardHeaderSection>
                                         <HeaderLayer

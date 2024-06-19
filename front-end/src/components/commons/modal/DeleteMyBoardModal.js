@@ -104,7 +104,7 @@ export default function DeleteMyBoardModal({
             console.log(whatDeleteBoardList);
             console.log(userId);
             console.log('삭제 쿼리 시작');
-            // 게시글 삭제를 위한 통신 코드
+            // // 게시글 삭제를 위한 통신 코드
             const fullURL = `http://localhost:8080/delete/myBoardList`;
             const response = await axios.delete(fullURL, {
                 data: { whatDeleteBoardList, userId }
