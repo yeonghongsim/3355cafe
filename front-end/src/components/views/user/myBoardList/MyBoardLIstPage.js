@@ -1,6 +1,10 @@
 import { useLocation } from "react-router-dom";
 import styled from "styled-components";
 import LOGO from "../../../commons/logo/LOGO";
+import CheckBoxWrapper01 from "../../../commons/input/CheckBoxWrapper01";
+import CheckBoxWrapper02 from "../../../commons/input/CheckBoxWrapper02";
+import NoCheckedBoardModal from "../../../commons/modal/NoCheckedBoardModal";
+import { useEffect, useState } from "react";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -28,6 +32,8 @@ const BoardListContainer = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
     gap: 0.15rem;
+    padding-top: 1.5rem;
+    box-sizing: border-box;
 `;
 const Layer = styled.div`
     width: 100%;
@@ -122,18 +128,91 @@ const BeleteBtn = styled.div`
 export default function MyBoardLIstPage() {
     const location = useLocation();
     const myBoardList = location?.state.myBoardList;
-    console.log(myBoardList);
+    const [checkInfoList, setCheckInfoList] = useState([]);
+    const [isOnModal, setIsOnModal] = useState(false);
+    const handleModalClose = () => {
+        setIsOnModal(false);
+    };
+    useEffect(() => {
+        const initializeCheckBoxList = async () => {
+            const initialCheckBoxList = myBoardList.map(board => ({
+                _id: board._id,
+                isChecked: false,
+            }));
+            setCheckInfoList(initialCheckBoxList);
+        };
+        initializeCheckBoxList();
+    }, [
+        myBoardList,
+    ]);
+    const handleRemoveSelectedBoard = () => {
+        // console.log('remove selected');
+        const checkedBoardList = checkInfoList.filter((info) => info.isChecked === true);
+        if (checkedBoardList.length === 0) {
+            setIsOnModal(true);
+        } else {
+            const boardIdList = checkedBoardList.map((board) => board._id);
+            console.log(boardIdList);
+            console.log('삭제 쿼리 시작');
+        }
+    };
+    const handleRemoveAllBoard = () => {
+        console.log('remove all');
+        console.log('삭제 쿼리 시작');
+    };
+    const [allCheckBox, setAllCheckBox] = useState(false);
+    const handleAllCheckBox = () => {
+        setAllCheckBox(!allCheckBox);
+        let copy = [...checkInfoList];
+        if (!allCheckBox) {
+            const initialCopy = copy.map(board => ({
+                _id: board._id,
+                isChecked: true
+            }));
+            copy = initialCopy;
+        } else {
+            const initialCopy = copy.map(board => ({
+                _id: board._id,
+                isChecked: false
+            }));
+            copy = initialCopy;
+        }
+        setCheckInfoList(copy);
+    };
+    const handleEachCheckBox = (i) => {
+        const copy = [...checkInfoList];
+        copy[i].isChecked = !copy[i].isChecked;
+        setCheckInfoList(copy);
+        const allChecked = checkInfoList.every((info) => info.isChecked === true);
+        if (allChecked) {
+            setAllCheckBox(true);
+        } else {
+            setAllCheckBox(false);
+        }
+    };
     return (
         <Wrapper>
             <BodySection>
                 <LOGO></LOGO>
                 <BoardListContainer>
                     <Layer $border={false}>
-                        <CheckBoxContainer $borderRight={false}>chkall</CheckBoxContainer>
+                        <CheckBoxContainer $borderRight={false}>
+                            <CheckBoxWrapper01
+                                id='allCheck'
+                                allCheckBox={allCheckBox}
+                                handleAllCheckBox={handleAllCheckBox}
+                            ></CheckBoxWrapper01>
+                        </CheckBoxContainer>
                         <ElseCheckBoxContainer>
                             <DeleteBtnContainer>
-                                <BeleteBtn $bgColor="#686D76">선택 삭제</BeleteBtn>
-                                <BeleteBtn $bgColor="#FF0000">전체 삭제</BeleteBtn>
+                                <BeleteBtn
+                                    $bgColor="#686D76"
+                                    onClick={() => handleRemoveSelectedBoard()}
+                                >선택 삭제</BeleteBtn>
+                                <BeleteBtn
+                                    $bgColor="#FF0000"
+                                    onClick={() => handleRemoveAllBoard()}
+                                >전체 삭제</BeleteBtn>
                             </DeleteBtnContainer>
                         </ElseCheckBoxContainer>
                     </Layer>
@@ -145,9 +224,15 @@ export default function MyBoardLIstPage() {
                                     key={i}
                                     $border={true}
                                 >
-                                    <CheckBoxContainer
-                                        $borderRight={true}
-                                    >chkbox</CheckBoxContainer>
+                                    <CheckBoxContainer $borderRight={true}>
+                                        <CheckBoxWrapper02
+                                            index={i}
+                                            id={`chkBox${i}`}
+                                            name={`chkBox${i}`}
+                                            checkInfo={checkInfoList[i]}
+                                            handleEachCheckBox={handleEachCheckBox}
+                                        ></CheckBoxWrapper02>
+                                    </CheckBoxContainer>
                                     <ElseCheckBoxContainer>
                                         <BoardContainer>
                                             <BoardTypeWrapper>
@@ -167,6 +252,10 @@ export default function MyBoardLIstPage() {
                     </Layer>
                 </BoardListContainer>
             </BodySection>
+            <NoCheckedBoardModal
+                isOn={isOnModal}
+                handleModalClose={handleModalClose}
+            ></NoCheckedBoardModal>
         </Wrapper>
     )
 }

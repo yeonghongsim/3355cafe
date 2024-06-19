@@ -7,43 +7,44 @@ const Wrapper = styled.div`
     align-items: center;
     justify-content: center;
 `;
-const HideInput = styled.input`
-    display: none;
-`;
-const ChkBoxImg = styled.img`
-    width: 4rem;
-    height: 4rem;
+const ToggleImg = styled.img`
+    width: 100%;
+    height: 100%;
     flex-shrink: 0;
     &:hover {
         cursor: pointer;
     }
 `;
+const HideInput = styled.input`
+    display: none;
+`;
 
-export default function CheckBoxWrapper01({
+export default function TestCheckBoxWrapper01({
     id,
-    allCheckBox,
-    handleAllCheckBox
+    isCheckedAll,
+    toggleAllCheckBox
 }) {
     return (
         <Wrapper>
             {
-                allCheckBox ?
-                    <ChkBoxImg
+                isCheckedAll ?
+                    <ToggleImg
                         src="/image/checkbox-checked.svg"
                         draggable="false"
-                        onClick={() => handleAllCheckBox()}
-                    ></ChkBoxImg> :
-                    <ChkBoxImg
+                        onClick={() => { toggleAllCheckBox() }}
+                    ></ToggleImg> :
+                    <ToggleImg
                         src="/image/checkbox-unchecked.svg"
                         draggable="false"
-                        onClick={() => handleAllCheckBox()}
-                    ></ChkBoxImg>
+                        onClick={() => { toggleAllCheckBox() }}
+                    ></ToggleImg>
             }
             <HideInput
+                type="checkbox"
                 id={id}
                 name={id}
-                checked={allCheckBox}
-                onChange={() => handleAllCheckBox()}
+                checked={isCheckedAll}
+                onChange={() => { toggleAllCheckBox() }}
             ></HideInput>
         </Wrapper>
     )

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import styled from "styled-components"
 
 const Wrapper = styled.div`
@@ -8,58 +7,47 @@ const Wrapper = styled.div`
     align-items: center;
     justify-content: center;
 `;
-const ToggleImg = styled.img`
-    width: 100%;
-    height: 100%;
+const HideInput = styled.input`
+    display: none;
+`;
+const ChkBoxImg = styled.img`
+    width: 4rem;
+    height: 4rem;
     flex-shrink: 0;
     &:hover {
         cursor: pointer;
     }
 `;
-const HideInput = styled.input`
-    display: none;
-`;
 
 export default function CheckBoxWrapper02({
+    index,
     id,
-    toggleEachCheckBox,
-    checkedBoxs,
-    setCheckedBoxs
+    name,
+    checkInfo,
+    handleEachCheckBox,
 }) {
-    const [isCheckedEach, setIsCheckedEach] = useState(false);
-    const checkboxClick = (id) => {
-        toggleEachCheckBox(id);
-        setIsCheckedEach(!isCheckedEach);
-        console.log(checkedBoxs);
-        let copy = [...checkedBoxs];
-        if (!copy.includes(id)) {
-            copy.push(id);
-        } else {
-            copy.filter((boardId) => boardId !== id);
-        }
-        setCheckedBoxs(copy);
-    };
+    const isChecked = checkInfo?.isChecked;
 
     return (
         <Wrapper>
             {
-                isCheckedEach ?
-                    <ToggleImg
+                isChecked ?
+                    <ChkBoxImg
                         src="/image/checkbox-checked.svg"
                         draggable="false"
-                        onClick={() => checkboxClick(id)}
-                    ></ToggleImg> :
-                    <ToggleImg
+                        onClick={() => handleEachCheckBox(index)}
+                    ></ChkBoxImg> :
+                    <ChkBoxImg
                         src="/image/checkbox-unchecked.svg"
                         draggable="false"
-                        onClick={() => checkboxClick(id)}
-                    ></ToggleImg>
+                        onClick={() => handleEachCheckBox(index)}
+                    ></ChkBoxImg>
             }
             <HideInput
-                type="checkbox"
                 id={id}
-                checked={isCheckedEach}
-                onChange={() => checkboxClick(id)}
+                name={name}
+                checked={checkInfo?.isChecked}
+                onChange={() => handleEachCheckBox(index)}
             ></HideInput>
         </Wrapper>
     )
