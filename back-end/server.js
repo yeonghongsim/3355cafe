@@ -295,6 +295,29 @@ app.post('/update/board/toggleUnlikeList', async function (req, res) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
 });
+// update board
+app.post('/update/board', async function (req, res) {
+    console.log('start update board');
+    try {
+        const data = req.body;
+        const boardId = data.boardId;
+        const prepareData = data.prepareData;
+
+        const result = await db.collection('board').updateOne(
+            { _id: new ObjectId(boardId) },
+            { $set: prepareData }
+        )
+        console.log('Matched ' + result.matchedCount + ' document(s) and modified ' + result.modifiedCount + ' document(s)');
+        const board = await db.collection('board').findOne({
+            _id: new ObjectId(boardId)
+        });
+        res.status(200).json({ message: 'Success', board });
+    }
+    catch (error) {
+        console.error('Error processing updateBoard request:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
+    }
+});
 // /update/user/${userId}/logInfo
 app.post('/update/user/:userId/logInfo', async function (req, res) {
     console.log('start update user loginfo');

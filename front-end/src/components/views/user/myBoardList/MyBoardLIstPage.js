@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import LOGO from "../../../commons/logo/LOGO";
 import CheckBoxWrapper01 from "../../../commons/input/CheckBoxWrapper01";
@@ -33,7 +33,6 @@ const BoardListFullContainer = styled.div`
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 0.15rem;
     padding-top: 1.5rem;
     box-sizing: border-box;
 `;
@@ -91,9 +90,12 @@ const BoardContainer = styled.div`
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
+    &:hover {
+        cursor: pointer;
+    }
 `;
 const BoardTypeWrapper = styled.div`
-    width: 8%;
+    width: 8rem;
     height: 100%;
     display: flex;
     align-items: center;
@@ -102,7 +104,7 @@ const BoardTypeWrapper = styled.div`
     // box-sizing: border-box;
 `;
 const BoardTitleWrapper = styled.div`
-    width: 60%;
+    width: calc(100% - 8rem);
     height: 100%;
     display: flex;
     align-items: center;
@@ -143,11 +145,12 @@ const BeleteBtn = styled.div`
 `;
 
 export default function MyBoardLIstPage() {
+    const navigate = useNavigate();
     const location = useLocation();
     const userInfo = useSelector((state) => state.user.user);
-    const myBoardList = location?.state.myBoardList;
+    // const myBoardList = location?.state.myBoardList;
+    const myBoardList = useSelector((state) => state.myBoardList.myBoardList);
     const [whatDeleteBoardList, setWhatDeleteBoardList] = useState([]);
-    // console.log(myBoardList);
     const [checkInfoList, setCheckInfoList] = useState([]);
     const [isOnModal, setIsOnModal] = useState(false);
     const [isOnDeleteModal, setIsOnDeleteModal] = useState(false);
@@ -237,6 +240,11 @@ export default function MyBoardLIstPage() {
             element.removeEventListener('wheel', handleScroll);
         };
     }, []);
+    const moveToBoardDetailPage = (board) => {
+        // console.log(location.pathname);
+        const prevPathname = location.pathname;
+        navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname } });
+    };
 
     return (
         <Wrapper>
@@ -284,7 +292,7 @@ export default function MyBoardLIstPage() {
                                                 ></CheckBoxWrapper02>
                                             </CheckBoxContainer>
                                             <ElseCheckBoxContainer>
-                                                <BoardContainer>
+                                                <BoardContainer onClick={() => moveToBoardDetailPage(board)}>
                                                     <BoardTypeWrapper>
                                                         <Text>{board.boardTypeName}</Text>
                                                     </BoardTypeWrapper>

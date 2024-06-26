@@ -1,15 +1,14 @@
+import { useLocation } from "react-router-dom";
 import styled from "styled-components"
-import LOGO from "../../../commons/logo/LOGO";
+import LOGO from "../../commons/logo/LOGO";
 import { useRef, useState } from "react";
-import { COLORS } from "../../../../commons/styles/COLORS";
-import RegiBoardSelect01 from "../../../commons/select/RegiBoardSelect01";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
-import { EditorState, convertToRaw } from "draft-js";
+import { COLORS } from "../../../commons/styles/COLORS";
+import RegiBoardSelect01 from "../../commons/select/RegiBoardSelect01";
 import { Editor } from "react-draft-wysiwyg";
-import draftToHtml from 'draftjs-to-html';
-import './custom-editor.css';
-import ResiBoardConfirmModal from "../../../commons/modal/ResiBoardConfirmModal";
+import { EditorState, convertToRaw, convertFromRaw } from "draft-js";
 import { useSelector } from "react-redux";
+import draftToHtml from 'draftjs-to-html';
+import UpdateBoardConfirmModal from "../../commons/modal/UpdateBoardConfirmModal";
 
 const Wrapper = styled.div`
     width: 100%;
@@ -181,37 +180,37 @@ const ErrorText = styled.p`
     }
 `;
 
-export default function RegisterBoardPage() {
-    const userInfo = useSelector((state) => (state.user.user));
+export default function UpdateBoardPage() {
+    const location = useLocation();
     const boardTypeList = useSelector((state) => state.boardTypeList.boardTypeList);
+    const board = location?.state.board;
     // select board type ref
     const boardTypeRef = useRef(null);
     // input title ref
     const titleInputRef = useRef(null);
     // input value length control
-    const [inputValue, setInputValue] = useState("");
-    // data validation 후 이상이 생겼을 때 사용할 state
+    const [inputValue, setInputValue] = useState(board.boardTitle);
     let [errorList, setErrorList] = useState([]);
     let [isOnErrBoardType, setIsOnErrBoardType] = useState(false);
     let [isOnErrBoardTitle, setIsOnErrBoardTitle] = useState(false);
     let [isOnErrBoardContent, setIsOnErrBoardContent] = useState(false);
     let isOnAnyErr = isOnErrBoardType || isOnErrBoardTitle || isOnErrBoardContent;
-    // confirm modal state
-    let [isOnConfirmModal, setIsOnConfirmModal] = useState(false);
-    // prepared data
-    let [prepareDate, setPrepareDate] = useState({});
-    // input change handler to limit length
     const handleInputChange = (e) => {
         if (e.target.value.length <= 40) {
             setInputValue(e.target.value);
         }
     };
+    // confirm modal state
+    let [isOnConfirmModal, setIsOnConfirmModal] = useState(false);
+    // prepared data
+    let [prepareData, setPrepareData] = useState({});
+
     // wysiwyg 관련 내용들
     const [editorState, setEditorState] = useState(() =>
-        EditorState.createEmpty()
+        EditorState.createWithContent(convertFromRaw(JSON.parse(board.contentRaw)))
     );
     // 업로드한 이미지를 알아보기 위한 state
-    const [uploadedImages, setUploadedImages] = useState([]);
+    const [uploadedImages, setUploadedImages] = useState(board.images);
     // image size 관련 오류로 인해 사이즈 조정 코드
     const resizeImage = (file, maxWidth, maxHeight) => {
         return new Promise((resolve, reject) => {
@@ -265,30 +264,20 @@ export default function RegisterBoardPage() {
             return Promise.reject(error);
         }
     };
+
     // resi btn click
     const handleRegiBtnClick = () => {
         const contentState = editorState.getCurrentContent();
         const contentRaw = convertToRaw(contentState);
         const contentHTML = draftToHtml(contentRaw);
-        const randomString1 = Math.random().toString(36).substring(2, 14);
-        const randomString2 = Math.random().toString(36).substring(2, 14);
-        // console.log(boardTypeList);
         const matchedBoard = boardTypeList.find((element) => element.value === boardTypeRef.current.value);
         const data = {
-            boardId: randomString1 + '-' + randomString2,
             boardTypeValue: matchedBoard.value,
             boardTypeName: matchedBoard.name,
             boardTitle: inputValue,
             contentRaw: JSON.stringify(contentRaw),
             contentHTML: contentHTML,
             images: uploadedImages,
-            userPrimeId: userInfo._id,
-            userId: userInfo.userId,
-            userName: userInfo.userName,
-            views: [],
-            date: new Date(),
-            likeList: [],
-            unLikeList: [],
         };
         // 데이터 유효성 검사하기
         const errors = [];
@@ -344,7 +333,7 @@ export default function RegisterBoardPage() {
             return;
         } else {
             // console.log(data);
-            setPrepareDate(data);
+            setPrepareData(data);
             setIsOnConfirmModal(true);
         }
     }
@@ -388,8 +377,8 @@ export default function RegisterBoardPage() {
                                 <BoardTypeContainer>
                                     <RegiBoardSelect01
                                         forwardRef={boardTypeRef}
-                                        defaultTypeName=''
-                                        defaultTypeValue=''
+                                        defaultTypeName={board.boardTypeName}
+                                        defaultTypeValue={board.boardTypeValue}
                                     ></RegiBoardSelect01>
                                 </BoardTypeContainer>
                                 <BoardTitleContainer>
@@ -400,6 +389,7 @@ export default function RegisterBoardPage() {
                                         <Input
                                             ref={titleInputRef}
                                             placeholder="40자 이내로 작성해주세요."
+                                            // defaultValue={board.boardTitle}
                                             value={inputValue}
                                             onChange={handleInputChange}
                                         ></Input>
@@ -451,14 +441,15 @@ export default function RegisterBoardPage() {
                         <Layer>
                             <BtnContainer>
                                 <RegiBtn onClick={handleRegiBtnClick}>
-                                    등록 하기
+                                    수정 하기
                                 </RegiBtn>
                             </BtnContainer>
-                            <ResiBoardConfirmModal
+                            <UpdateBoardConfirmModal
                                 isOn={isOnConfirmModal}
                                 handleModalClose={handleModalClose}
-                                prepareDate={prepareDate}
-                            ></ResiBoardConfirmModal>
+                                prepareData={prepareData}
+                                boardId={board?._id}
+                            ></UpdateBoardConfirmModal>
                         </Layer>
                     </Form>
                 </SmallWrapper>

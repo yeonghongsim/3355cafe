@@ -12,6 +12,7 @@ import BoardListPage from './components/views/board/BoardListPage';
 import BoardListBodyContainer from './components/views/board/BoardListBodyContainer';
 import BoardDetailPage from './components/views/boardDetail/BoardDetailPage';
 import RegisterBoardPage from './components/views/register/board/RegisterBoardPage';
+import UpdateBoardPage from './components/views/updateBoard/UpdateBoardPage';
 import Test1 from './components/views/test/Test1';
 import Test2Select from './components/views/test/Test2Select';
 import Test3If from './components/views/test/Test3If';
@@ -52,6 +53,7 @@ function App() {
           <Route path='search' element={<BoardListBodyContainer $location='/board/search' />}></Route>
         </Route>
         <Route path='/boardDetail/:id' element={< BoardDetailPage />}></Route>
+        <Route path='/updateBoard/:id' element={< UpdateBoardPage />}></Route>
         <Route path='/register'>
           <Route path='board' element={<RegisterBoardPage />}></Route>
         </Route>

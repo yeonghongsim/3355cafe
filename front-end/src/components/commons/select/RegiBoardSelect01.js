@@ -79,7 +79,9 @@ const Option = styled.div`
 `;
 
 export default function RegiBoardSelect01({
-    forwardRef
+    forwardRef,
+    defaultTypeName,
+    defaultTypeValue,
 }) {
     // select input ref
     const renderInputRef = useRef(null);
@@ -113,7 +115,10 @@ export default function RegiBoardSelect01({
 
     return (
         <Wrapper ref={selectRef}>
-            <HideInput ref={forwardRef}></HideInput>
+            <HideInput
+                ref={forwardRef}
+                defaultValue={defaultTypeValue}
+            ></HideInput>
             <InputWrapper
                 onClick={handleOptionOpen}
             >
@@ -121,6 +126,7 @@ export default function RegiBoardSelect01({
                     ref={renderInputRef}
                     placeholder="글 카테고리"
                     readOnly
+                    defaultValue={defaultTypeName}
                 ></Input>
             </InputWrapper>
             <OptionWrapper $isOn={isOn}>

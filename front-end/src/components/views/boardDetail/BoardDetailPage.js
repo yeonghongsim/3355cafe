@@ -429,6 +429,9 @@ export default function BoardDetailPage() {
         copy.push(board?._id);
         setWhatDeleteBoardList(copy);
     };
+    const moveToUpdateBoardPage = (board) => {
+        navigate(`/updateBoard/${board._id}`, { state: { board } });
+    };
 
     return (
         <Wrapper>
@@ -471,7 +474,10 @@ export default function BoardDetailPage() {
                                                     뒤로 가기
                                                 </BackText>
                                                 <BtnContainer>
-                                                    <Btn $bgColor="#0E46A3">수정하기</Btn>
+                                                    <Btn
+                                                        $bgColor="#0E46A3"
+                                                        onClick={() => moveToUpdateBoardPage(board)}
+                                                    >수정하기</Btn>
                                                     <Btn
                                                         $bgColor="red"
                                                         onClick={() => handleRemoveBoard()}>
