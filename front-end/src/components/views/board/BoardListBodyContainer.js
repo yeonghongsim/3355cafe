@@ -109,13 +109,13 @@ const BoardListSection = styled.section`
     width: 100%;
     height: calc(100% - 8vh);
 `;
-const BoardListContainer = styled.div`
+const BoardListFullContainer = styled.div`
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
-    gap: 0.1rem;
+    gap: 1rem;
 `;
 const EmptyBoardContainer = styled.div`
     width: 100%;
@@ -124,19 +124,44 @@ const EmptyBoardContainer = styled.div`
     align-items: center;
     justify-content: center;
 `;
-const BoardPageLayer = styled.div`
+const BoardListSmallContainer = styled.div`
     width: 100%;
-    height: 2.5rem;
+    height: 45rem;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: hidden;
+    &:hover {
+        cursor: pointer;
+    }
 `;
-const Text = styled.p`
-    font-size: 1.6rem;
-    font-weight: normal;
-    color: black;
-    margin: 0;
+const BoardListWrapper = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    transform: ${(props) => `translateX(${props.$transformX}px)`};
+    transition: transform 0.85s ease-out;
+    will-change: transform;
+    // overflow-x: scroll;
+    scroll-behavior: smooth;
+    &::-webkit-scrollbar {
+        display: none;
+    }
 `;
+const BoardListEachContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-shrink: 0;
+    // background-color: #eee;
+`;
+
 const BoardContainer = styled.div`
     width: 100%;
     height: 5rem;
@@ -154,19 +179,17 @@ const BoardTypeWrapper = styled.div`
     align-items: center;
     justify-content: center;
     // background-color: #eee;
-    font-size: 1.4rem;
 `;
 const BoardWriterWrapper = styled.div`
-    width: 10%;
+    width: 12%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     // background-color: #d9d9d9;
-    font-size: 1.4rem;
 `;
 const BoardTitleWrapper = styled.div`
-    width: 42%;
+    width: 43%;
     height: 100%;
     display: flex;
     align-items: center;
@@ -175,24 +198,18 @@ const BoardTitleWrapper = styled.div`
     font-size: 1.4rem;
     padding-left: 1rem;
     box-sizing: border-box;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 `;
-const BoardViewsWrapper = styled.div`
-    width: 10%;
+const BoardEmotionWrapper = styled.div`
+    width: 18%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     // background-color: #d9d9d9;
-    font-size: 1.4rem;
-`;
-const BoardEmotionWrapper = styled.div`
-    width: 20%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    // background-color: #eee;
-    font-size: 1.4rem;
+    // font-size: 1.4rem;
 `;
 const ThumsImg = styled.img`
     width: 2.5rem;
@@ -213,14 +230,103 @@ const BoardEmotionText = styled.p`
         `
     }
 `;
-const BoardDateWrapper = styled.div`
+const BoardViewsWrapper = styled.div`
     width: 10%;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    // background-color: #eee;
+    // font-size: 1.4rem;
+`;
+const BoardDateWrapper = styled.div`
+    width: 9%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     // background-color: #d9d9d9;
-    font-size: 1.4rem;
+    // font-size: 1.4rem;
+`;
+const PageNumListFullContainer = styled.div`
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+`;
+const PageMoveContainer = styled.div`
+    width: 3rem;
+    height: 3rem;
+`;
+const PageNumListContainer = styled.div`
+    width: 30rem;
+    height: 3rem;
+    overflow: hidden;
+`;
+const PageNumListWrapper = styled.div`
+    width: fit-content;
+    height: 100%;
+    display: flex;
+    transform: ${props => `translateX(-${(props.$nowPageLayer - 1) * 30}rem)`};
+    transition: transform 0.85s ease;
+    will-change: transform;
+`;
+const PageLayerSmallContainer = styled.div`
+    width: 30rem;
+    height: 3rem;
+    flex-shrink: 0;
+    flex: 1;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 0.5rem;
+`;
+const PageNumTextContainer = styled.div`
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: ${(props) => (props.$nowPageNum === props.$pageNum ? '#4B70F5' : 'white')};
+    border: 1px solid #d9d9d9;
+    box-sizing: border-box;
+    border-radius: 50%;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+const PageNumText = styled.p`
+    font-size: 1.5rem;
+    font-weight: ${(props) => (props.$nowPageNum === props.$pageNum ? 'bold' : 'normal')};
+    color: ${(props) => (props.$nowPageNum === props.$pageNum ? 'white' : 'black')};
+    margin: 0;
+`;
+const PageMoveImgContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #d9d9d9;
+    box-sizing: border-box;
+    border-radius: 50%;
+    &:hover {
+        cursor: pointer;
+    }
+`;
+const PageMoveImg = styled.img`
+    width: 50%;
+    height: 50%;
+    flex-shrink: 0;
+`;
+const Text = styled.p`
+    font-size: 1.65rem;
+    font-weight: normal;
+    color: black;
+    margin: 0;
+    padding: 0;
 `;
 
 export default function BoardListBodyContainer({
@@ -240,6 +346,16 @@ export default function BoardListBodyContainer({
     const userInfo = useSelector((state) => state.user.user);
     // board list from fetch get
     let [boardList, setBoardList] = useState([]);
+    const [nowPageNum, setNowPageNum] = useState(1);
+    const [lastPageNum, setLastpageNum] = useState(0);
+    const [nowPageLayer, setNowPageLayer] = useState(1);
+    const [pageNumList, setPageNumList] = useState([]);
+    // dragging state
+    const boardListWrapperRef = useRef(null);
+    const [startX, setStartX] = useState(null);
+    const [dragging, setDragging] = useState(false);
+    const [transformX, setTransformX] = useState(0);
+    const [howMuchDrag, setHowMuchDrag] = useState(0);
     // search input ref
     const searchInputRef = useRef(null);
     // fetching board list
@@ -252,10 +368,41 @@ export default function BoardListBodyContainer({
                 try {
                     const fullURL = `http://localhost:8080/boardList`;
                     const response = await axios.get(fullURL);
-                    const result = await response.data;
-                    setBoardList(result);
+                    const boardList = await response.data;
+                    let boardListFullCopy = [];
+                    let boardListSmallCopy = [];
+                    let count = 1;
+                    let pageNumFullCopy = [];
+                    let pageNumSmallCopy = [];
+
+                    for (let i = 0; i < boardList.length; i++) {
+                        boardListSmallCopy.push(boardList[i]);
+                        // 각 리스트 <= 9개 게시글
+                        if ((i + 1) % 9 === 0) {
+                            boardListFullCopy.push(boardListSmallCopy);
+                            boardListSmallCopy = [];
+                            pageNumSmallCopy.push(count);
+                            if (count % 3 === 0) {
+                                pageNumFullCopy.push(pageNumSmallCopy);
+                                pageNumSmallCopy = [];
+                            }
+                            count += 1;
+                        }
+                        // 마지막 리스트 <= 9개 미만의 게시글
+                        if (i === boardList.length - 1) {
+                            boardListFullCopy.push(boardListSmallCopy);
+                            pageNumSmallCopy.push(count);
+                            pageNumFullCopy.push(pageNumSmallCopy);
+                        }
+                    };
+                    // 저장한 모든 리스트를 갖는 전체 리스트
+                    setBoardList(boardListFullCopy);
+                    setPageNumList(pageNumFullCopy);
+                    setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
+                    // console.log(boardListFullCopy);
+                    console.log(pageNumFullCopy);
+                    // console.log(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
                     setIsLoading(false);
-                    // console.log(result);
                 } catch (error) {
                     // console.error('Error getting itemType data:', error);
                     throw error;
@@ -335,18 +482,94 @@ export default function BoardListBodyContainer({
         const searchData = searchInputRef.current.value;
         navigate(`/board/search`, { state: { searchData: searchData } });
     };
-    // click board
-    const handleClickBoard = (board) => {
-        if (userInfo === null) {
-            setIsOnAlertModal(true);
+    // mouse event area
+    const handleMouseDown = (e) => {
+        setStartX(e.pageX);
+        setDragging(true);
+        setHowMuchDrag(0);
+    };
+    const handleMouseMove = (e) => {
+        if (!dragging) return;
+        const deltaX = (e.pageX - startX);
+        // console.log('deltaX : ' + deltaX);
+        setHowMuchDrag((prevHowMuchDrag) => prevHowMuchDrag + deltaX);
+        setTransformX((prevTransformX) => prevTransformX + deltaX);
+        setStartX(e.pageX);
+    };
+    const handleMouseUp = () => {
+        setStartX(null);
+        setDragging(false);
+        setHowMuchDrag(0);
+        // 하나의 container width 1080
+        if (howMuchDrag === 0) {
+            if ((dragging)) {
+                console.log('just click');
+            }
+        } else if (howMuchDrag >= 150) {
+            if (nowPageNum > 1) {
+                // console.log('slide to prev container');
+                const initialPageNum = nowPageNum - 1;
+                setTransformX(-1080 * (initialPageNum - 1));
+                setNowPageNum(initialPageNum);
+                handlePageLayer(initialPageNum);
+            } else {
+                // console.log('slide to first container');
+                setTransformX(0);
+                handlePageLayer(nowPageNum);
+            }
+        } else if (howMuchDrag <= -150) {
+            if (nowPageNum < lastPageNum) {
+                // console.log('slide to next container');
+                const initialPageNum = nowPageNum + 1;
+                setTransformX(-1080 * (initialPageNum - 1));
+                setNowPageNum(initialPageNum);
+                handlePageLayer(initialPageNum);
+            } else {
+                // console.log('slide to last container');
+                setTransformX(-1080 * (lastPageNum - 1));
+                handlePageLayer(lastPageNum - 1);
+            }
         } else {
-            moveToBoardDetailPage(board);
+            // console.log('slide to now container');
+            const initialPageNum = nowPageNum;
+            setTransformX(-1080 * (initialPageNum - 1));
+            handlePageLayer(initialPageNum - 1);
         }
     };
-    const moveToBoardDetailPage = async (board) => {
-        const prevPathname = location.pathname;
-        const searchData = searchInputRef.current.value;
-        navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData } });
+    // const moveToBoardDetailPage = async (board) => {
+    //     const prevPathname = location.pathname;
+    //     const searchData = searchInputRef.current.value;
+    //     navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData } });
+    // };
+    const handleClickPageNum = (pageNum) => {
+        // console.log(pageNum);
+        setNowPageNum(pageNum);
+        setTransformX(-1080 * (pageNum - 1));
+        handlePageLayer(pageNum);
+    };
+    const handlePageLayer = (pageNum) => {
+        // console.log('set page layer');
+        // console.log('pageNum : ' + pageNum);
+        const initialPageLayer = Math.ceil(pageNum / 3);
+        // console.log('initialPageLayer : ' + initialPageLayer);
+        setNowPageLayer(initialPageLayer);
+    };
+    const togglePageMove = (forward) => {
+        if (forward === 'prev') {
+            console.log('click prev');
+            const initialPageNum = nowPageNum - 1;
+            console.log(initialPageNum);
+            setNowPageNum(initialPageNum);
+            handlePageLayer(initialPageNum);
+            setTransformX(-1080 * (initialPageNum - 1));
+        } else {
+            console.log('click next');
+            const initialPageNum = nowPageNum + 1;
+            console.log(initialPageNum);
+            setNowPageNum(initialPageNum);
+            handlePageLayer(initialPageNum);
+            setTransformX(-1080 * (initialPageNum - 1));
+        }
     };
 
     return (
@@ -379,48 +602,131 @@ export default function BoardListBodyContainer({
                 {
                     isLoading ?
                         <Spinner></Spinner> :
-                        <BoardListContainer>
+                        <BoardListFullContainer>
                             {
                                 boardList.length === 0 ?
                                     <EmptyBoardContainer>
                                         <Text>게시글이 없습니다.</Text>
                                     </EmptyBoardContainer>
                                     :
-                                    boardList?.map((board, idx) => (
-                                        <BoardContainer
-                                            key={idx}
-                                            $boardIndex={idx + 1}
-                                            onClick={() => handleClickBoard(board)}>
-                                            <BoardTypeWrapper>[ {board.boardTypeName} ]</BoardTypeWrapper>
-                                            <BoardWriterWrapper>{board.userId}</BoardWriterWrapper>
-                                            <BoardTitleWrapper>{board.boardTitle}</BoardTitleWrapper>
-                                            <BoardEmotionWrapper>
+                                    <>
+                                        <BoardListSmallContainer>
+                                            <BoardListWrapper
+                                                ref={boardListWrapperRef}
+                                                $transformX={transformX}
+                                                onMouseDown={handleMouseDown}
+                                                onMouseMove={handleMouseMove}
+                                                onMouseUp={handleMouseUp}
+                                                onMouseLeave={handleMouseUp}
+                                            >
                                                 {
-                                                    board.likeList.includes(userInfo?._id) ?
-                                                        <ThumsImg src="/image/onThumbs-up.svg"></ThumsImg>
-                                                        : <ThumsImg src="/image/offThumbs-up.svg"></ThumsImg>
+                                                    boardList.map((boards, i) =>
+                                                        <BoardListEachContainer
+                                                            key={i}
+                                                        >
+                                                            {
+                                                                boards.map((board, j) =>
+                                                                    <BoardContainer
+                                                                        key={j}
+                                                                    >
+                                                                        <BoardTypeWrapper>
+                                                                            <Text>[ {board.boardTypeName} ]</Text>
+                                                                        </BoardTypeWrapper>
+                                                                        <BoardWriterWrapper>
+                                                                            <Text> {board.userId} </Text>
+                                                                        </BoardWriterWrapper>
+                                                                        <BoardTitleWrapper>
+                                                                            <Text> {board.boardTitle} </Text>
+                                                                        </BoardTitleWrapper>
+                                                                        <BoardEmotionWrapper>
+                                                                            {
+                                                                                board.likeList.includes(userInfo?._id) ?
+                                                                                    <ThumsImg src="/image/onThumbs-up.svg" draggable="false"></ThumsImg>
+                                                                                    : <ThumsImg src="/image/offThumbs-up.svg" draggable="false"></ThumsImg>
+                                                                            }
+                                                                            <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>
+                                                                            {
+                                                                                board.unLikeList.includes(userInfo?._id) ?
+                                                                                    <ThumsImg src="/image/onThumbs-down.svg" draggable="false"></ThumsImg>
+                                                                                    : <ThumsImg src="/image/offThumbs-down.svg" draggable="false"></ThumsImg>
+                                                                            }
+                                                                            <BoardEmotionText $afterText={false}>{board.unLikeList.length}</BoardEmotionText>
+                                                                        </BoardEmotionWrapper>
+                                                                        <BoardViewsWrapper>
+                                                                            <Text>조회수 : {board.views.length}</Text>
+                                                                        </BoardViewsWrapper>
+                                                                        <BoardDateWrapper>
+                                                                            <Text>{board.date.slice(2, 10)}</Text>
+                                                                        </BoardDateWrapper>
+                                                                    </BoardContainer>
+                                                                )
+                                                            }
+                                                        </BoardListEachContainer>
+                                                    )
                                                 }
-                                                <BoardEmotionText $afterText={true}>{board.likeList.length}</BoardEmotionText>
+                                            </BoardListWrapper>
+                                        </BoardListSmallContainer>
+                                        <PageNumListFullContainer>
+                                            <PageMoveContainer>
                                                 {
-                                                    board.unLikeList.includes(userInfo?._id) ?
-                                                        <ThumsImg src="/image/onThumbs-down.svg"></ThumsImg>
-                                                        : <ThumsImg src="/image/offThumbs-down.svg"></ThumsImg>
+                                                    nowPageNum === 1 ? null :
+                                                        <PageMoveImgContainer
+                                                            onClick={() => togglePageMove('prev')}
+                                                        >
+                                                            <PageMoveImg
+                                                                src="/image/chevron-left.svg"
+                                                                draggable="false"
+                                                            ></PageMoveImg>
+                                                        </PageMoveImgContainer>
                                                 }
-                                                <BoardEmotionText $afterText={false}>{board.unLikeList.length}</BoardEmotionText>
-                                            </BoardEmotionWrapper>
-                                            <BoardDateWrapper>{board.date.slice(0, 10)}</BoardDateWrapper>
-                                            <BoardViewsWrapper>조회수 : {board.views.length}</BoardViewsWrapper>
-                                        </BoardContainer>
-
-                                    ))
+                                            </PageMoveContainer>
+                                            <PageNumListContainer>
+                                                <PageNumListWrapper
+                                                    $nowPageLayer={nowPageLayer}
+                                                >
+                                                    {
+                                                        pageNumList.map((pageLayer, i) =>
+                                                            <PageLayerSmallContainer
+                                                                key={i}
+                                                            >
+                                                                {
+                                                                    pageLayer.map((pageNum, j) =>
+                                                                        <PageNumTextContainer
+                                                                            key={j}
+                                                                            $nowPageNum={nowPageNum}
+                                                                            $pageNum={pageNum}
+                                                                            onClick={() => handleClickPageNum(pageNum)}
+                                                                        >
+                                                                            <PageNumText
+                                                                                $nowPageNum={nowPageNum}
+                                                                                $pageNum={pageNum}
+                                                                            >
+                                                                                {pageNum}
+                                                                            </PageNumText>
+                                                                        </PageNumTextContainer>
+                                                                    )
+                                                                }
+                                                            </PageLayerSmallContainer>
+                                                        )
+                                                    }
+                                                </PageNumListWrapper>
+                                            </PageNumListContainer>
+                                            <PageMoveContainer>
+                                                {
+                                                    nowPageNum === lastPageNum ? null :
+                                                        <PageMoveImgContainer>
+                                                            <PageMoveImg
+                                                                src="/image/chevron-right.svg"
+                                                                draggable="false"
+                                                                onClick={() => togglePageMove('next')}
+                                                            ></PageMoveImg>
+                                                        </PageMoveImgContainer>
+                                                }
+                                            </PageMoveContainer>
+                                        </PageNumListFullContainer>
+                                    </>
                             }
-                            {
-                                boardList.length !== 0 ?
-                                    < BoardPageLayer >
-                                        <Text>page number</Text>
-                                    </BoardPageLayer> : null
-                            }
-                        </BoardListContainer>
+                        </BoardListFullContainer>
                 }
             </BoardListSection>
             <UnLoginAlertModal
