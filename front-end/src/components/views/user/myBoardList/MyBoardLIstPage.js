@@ -38,7 +38,7 @@ const BoardListFullContainer = styled.div`
 `;
 const BoardListContainer = styled.div`
     width: 100%;
-    height: 52rem;
+    height: ${(props) => (props.$boardsLength === 0 ? '10rem' : '0rem')};
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
@@ -118,6 +118,11 @@ const Text = styled.p`
     font-weight: normal;
     color: black;
     margin: 0;
+    &:hover {
+        color: ${(props) => (props.$isLink ? 'blue' : 'black')};
+        text-decoration: ${(props) => (props.$isLink ? 'underline' : 'none')};
+        cursor: ${(props) => (props.$isLink ? 'pointer' : 'normal')};
+    }
 `;
 const DeleteBtnContainer = styled.div`
     width: 100%;
@@ -142,6 +147,17 @@ const BeleteBtn = styled.div`
     &:hover {
         cursor: pointer;
     }
+`;
+const EmptyBoardContainer = styled.div`
+    width: 100%;
+    height: 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+    padding-left: 1rem;
+    box-sizing: border-box;
 `;
 
 export default function MyBoardLIstPage() {
@@ -245,38 +261,64 @@ export default function MyBoardLIstPage() {
         const prevPathname = location.pathname;
         navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname } });
     };
+    const moveToPage = (forward) => {
+
+        if (forward === 'home') {
+            navigate('/');
+        } else {
+            navigate('/register/board');
+        }
+    };
 
     return (
         <Wrapper>
             <BodySection>
                 <LOGO></LOGO>
+                {
+                    myBoardList.length === 0 ?
+                        <EmptyBoardContainer>
+                            <Text $isLink={false}>작성하신 게시글이 없습니다.</Text>
+                            <Text
+                                $isLink={true}
+                                onClick={() => moveToPage('regiBoard')}
+                            >게시글 작성하러 가기</Text>
+                            <Text
+                                $isLink={true}
+                                onClick={() => moveToPage('home')}
+                            >홈페이지로 가기</Text>
+                        </EmptyBoardContainer> : null
+                }
                 <BoardListFullContainer>
-                    <Layer $border={false}>
-                        <CheckBoxContainer $borderRight={false}>
-                            <CheckBoxWrapper01
-                                id='allCheck'
-                                allCheckBox={allCheckBox}
-                                handleAllCheckBox={handleAllCheckBox}
-                            ></CheckBoxWrapper01>
-                        </CheckBoxContainer>
-                        <ElseCheckBoxContainer>
-                            <DeleteBtnContainer>
-                                <BeleteBtn
-                                    $bgColor="#686D76"
-                                    onClick={() => handleRemoveSelectedBoard()}
-                                >선택 삭제</BeleteBtn>
-                                <BeleteBtn
-                                    $bgColor="#FF0000"
-                                    onClick={() => handleRemoveAllBoard()}
-                                >전체 삭제</BeleteBtn>
-                            </DeleteBtnContainer>
-                        </ElseCheckBoxContainer>
-                    </Layer>
-                    <BoardListContainer>
+                    {
+                        myBoardList.length === 0 ?
+                            null :
+                            <Layer $border={false}>
+                                <CheckBoxContainer $borderRight={false}>
+                                    <CheckBoxWrapper01
+                                        id='allCheck'
+                                        allCheckBox={allCheckBox}
+                                        handleAllCheckBox={handleAllCheckBox}
+                                    ></CheckBoxWrapper01>
+                                </CheckBoxContainer>
+                                <ElseCheckBoxContainer>
+                                    <DeleteBtnContainer>
+                                        <BeleteBtn
+                                            $bgColor="#686D76"
+                                            onClick={() => handleRemoveSelectedBoard()}
+                                        >선택 삭제</BeleteBtn>
+                                        <BeleteBtn
+                                            $bgColor="#FF0000"
+                                            onClick={() => handleRemoveAllBoard()}
+                                        >전체 삭제</BeleteBtn>
+                                    </DeleteBtnContainer>
+                                </ElseCheckBoxContainer>
+                            </Layer>
+                    }
+                    <BoardListContainer $boardsLength={myBoardList.length}>
                         <BoardListWrapper ref={listWrapperRef}>
                             {
                                 myBoardList.length === 0 ?
-                                    'not found board' :
+                                    null :
                                     myBoardList.map((board, i) =>
                                         <Layer
                                             key={i}
@@ -294,10 +336,10 @@ export default function MyBoardLIstPage() {
                                             <ElseCheckBoxContainer>
                                                 <BoardContainer onClick={() => moveToBoardDetailPage(board)}>
                                                     <BoardTypeWrapper>
-                                                        <Text>{board.boardTypeName}</Text>
+                                                        <Text $isLink={false}>{board.boardTypeName}</Text>
                                                     </BoardTypeWrapper>
                                                     <BoardTitleWrapper>
-                                                        <Text>{board.boardTitle}</Text>
+                                                        <Text $isLink={false}>{board.boardTitle}</Text>
                                                     </BoardTitleWrapper>
                                                 </BoardContainer>
                                             </ElseCheckBoxContainer>

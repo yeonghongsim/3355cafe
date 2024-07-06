@@ -132,18 +132,15 @@ const BoardListSmallContainer = styled.div`
     align-items: flex-start;
     justify-content: flex-start;
     overflow: hidden;
-    &:hover {
-        cursor: pointer;
-    }
 `;
 const BoardListWrapper = styled.div`
     width: 100%;
-    height: 100%;
+    height: fit-content;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     transform: ${(props) => `translateX(${props.$transformX}px)`};
-    transition: transform 0.85s ease-out;
+    transition: transform 0.55s ease-out;
     will-change: transform;
     // overflow-x: scroll;
     scroll-behavior: smooth;
@@ -153,13 +150,12 @@ const BoardListWrapper = styled.div`
 `;
 const BoardListEachContainer = styled.div`
     width: 100%;
-    height: 100%;
+    height: fit-content;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: flex-start;
     flex-shrink: 0;
-    // background-color: #eee;
 `;
 
 const BoardContainer = styled.div`
@@ -171,6 +167,9 @@ const BoardContainer = styled.div`
     border-top: 1px solid #d9d9d9;
     border-bottom: 1px solid #d9d9d9;
     box-sizing: border-box;
+    &:hover {
+        cursor: pointer;
+    }
 `;
 const BoardTypeWrapper = styled.div`
     width: 8%;
@@ -270,7 +269,7 @@ const PageNumListWrapper = styled.div`
     height: 100%;
     display: flex;
     transform: ${props => `translateX(-${(props.$nowPageLayer - 1) * 30}rem)`};
-    transition: transform 0.85s ease;
+    transition: transform 0.55s ease;
     will-change: transform;
 `;
 const PageLayerSmallContainer = styled.div`
@@ -279,8 +278,8 @@ const PageLayerSmallContainer = styled.div`
     flex-shrink: 0;
     flex: 1;
     display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
+    align-items: center;
+    justify-content: center;
     gap: 0.5rem;
 `;
 const PageNumTextContainer = styled.div`
@@ -362,47 +361,59 @@ export default function BoardListBodyContainer({
     useEffect(() => {
         if ($location.split('/').length === 2) {
             // console.log('board page');
-            searchInputRef.current.value = '';
             setIsLoading(true);
+            searchInputRef.current.value = '';
+            if (location?.state !== null) {
+                console.log(location?.state);
+                const prevPageNum = location?.state.prevPageNum;
+                // setNowPageNum(prevPageNum);
+                // console.log(prevPageNum);
+                setNowPageNum(prevPageNum);
+                // console.log(prevPageLayer);
+                setTransformX(-1080 * (prevPageNum - 1));
+                handlePageLayer(prevPageNum);
+            }
             const fetchItems = async () => {
                 try {
                     const fullURL = `http://localhost:8080/boardList`;
                     const response = await axios.get(fullURL);
                     const boardList = await response.data;
-                    let boardListFullCopy = [];
-                    let boardListSmallCopy = [];
-                    let count = 1;
-                    let pageNumFullCopy = [];
-                    let pageNumSmallCopy = [];
+                    if (boardList.length === 0) {
+                        setBoardList([]);
+                        setIsLoading(false);
+                    } else {
+                        let boardListFullCopy = [];
+                        let boardListSmallCopy = [];
+                        let count = 1;
+                        let pageNumFullCopy = [];
+                        let pageNumSmallCopy = [];
 
-                    for (let i = 0; i < boardList.length; i++) {
-                        boardListSmallCopy.push(boardList[i]);
-                        // 각 리스트 <= 9개 게시글
-                        if ((i + 1) % 9 === 0) {
-                            boardListFullCopy.push(boardListSmallCopy);
-                            boardListSmallCopy = [];
-                            pageNumSmallCopy.push(count);
-                            if (count % 3 === 0) {
-                                pageNumFullCopy.push(pageNumSmallCopy);
-                                pageNumSmallCopy = [];
+                        for (let i = 0; i < boardList.length; i++) {
+                            boardListSmallCopy.push(boardList[i]);
+                            // 각 리스트 <= 9개 게시글
+                            if ((i + 1) % 9 === 0) {
+                                boardListFullCopy.push(boardListSmallCopy);
+                                boardListSmallCopy = [];
+                                pageNumSmallCopy.push(count);
+                                if (count % 3 === 0) {
+                                    pageNumFullCopy.push(pageNumSmallCopy);
+                                    pageNumSmallCopy = [];
+                                }
+                                count += 1;
                             }
-                            count += 1;
-                        }
-                        // 마지막 리스트 <= 9개 미만의 게시글
-                        if (i === boardList.length - 1) {
-                            boardListFullCopy.push(boardListSmallCopy);
-                            pageNumSmallCopy.push(count);
-                            pageNumFullCopy.push(pageNumSmallCopy);
-                        }
-                    };
-                    // 저장한 모든 리스트를 갖는 전체 리스트
-                    setBoardList(boardListFullCopy);
-                    setPageNumList(pageNumFullCopy);
-                    setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
-                    // console.log(boardListFullCopy);
-                    console.log(pageNumFullCopy);
-                    // console.log(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
-                    setIsLoading(false);
+                            // 마지막 리스트 <= 9개 미만의 게시글
+                            if (i === boardList.length - 1) {
+                                boardListFullCopy.push(boardListSmallCopy);
+                                pageNumSmallCopy.push(count);
+                                pageNumFullCopy.push(pageNumSmallCopy);
+                            }
+                        };
+                        // 저장한 모든 리스트를 갖는 전체 리스트
+                        setBoardList(boardListFullCopy);
+                        setPageNumList(pageNumFullCopy);
+                        setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
+                        setIsLoading(false);
+                    }
                 } catch (error) {
                     // console.error('Error getting itemType data:', error);
                     throw error;
@@ -414,15 +425,59 @@ export default function BoardListBodyContainer({
             // console.log('board/more page');
             searchInputRef.current.value = '';
             setIsLoading(true);
+            if (location?.state !== null) {
+                console.log(location?.state);
+                const prevPageNum = location?.state.prevPageNum;
+                // setNowPageNum(prevPageNum);
+                // console.log(prevPageNum);
+                setNowPageNum(prevPageNum);
+                // console.log(prevPageLayer);
+                setTransformX(-1080 * (prevPageNum - 1));
+                handlePageLayer(prevPageNum);
+            }
             const moreURL = $location.split('/')[2];
             // console.log(moreURL);
             const fetchItems = async () => {
                 try {
                     const fullURL = `http://localhost:8080/boardList/${moreURL}`;
                     const response = await axios.get(fullURL);
-                    const result = await response.data;
-                    setBoardList(result);
-                    setIsLoading(false);
+                    const boardList = await response.data;
+                    if (boardList.length === 0) {
+                        setBoardList([]);
+                        setIsLoading(false);
+                    } else {
+                        let boardListFullCopy = [];
+                        let boardListSmallCopy = [];
+                        let count = 1;
+                        let pageNumFullCopy = [];
+                        let pageNumSmallCopy = [];
+
+                        for (let i = 0; i < boardList.length; i++) {
+                            boardListSmallCopy.push(boardList[i]);
+                            // 각 리스트 <= 9개 게시글
+                            if ((i + 1) % 9 === 0) {
+                                boardListFullCopy.push(boardListSmallCopy);
+                                boardListSmallCopy = [];
+                                pageNumSmallCopy.push(count);
+                                if (count % 3 === 0) {
+                                    pageNumFullCopy.push(pageNumSmallCopy);
+                                    pageNumSmallCopy = [];
+                                }
+                                count += 1;
+                            }
+                            // 마지막 리스트 <= 9개 미만의 게시글
+                            if (i === boardList.length - 1) {
+                                boardListFullCopy.push(boardListSmallCopy);
+                                pageNumSmallCopy.push(count);
+                                pageNumFullCopy.push(pageNumSmallCopy);
+                            }
+                        };
+                        // 저장한 모든 리스트를 갖는 전체 리스트
+                        setBoardList(boardListFullCopy);
+                        setPageNumList(pageNumFullCopy);
+                        setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
+                        setIsLoading(false);
+                    }
                 } catch (error) {
                     // console.error('Error getting itemType data:', error);
                     throw error;
@@ -432,19 +487,64 @@ export default function BoardListBodyContainer({
             fetchItems();
         } else {
             setIsLoading(true);
+            if (location?.state !== null) {
+                console.log(location?.state);
+                const prevPageNum = location?.state.prevPageNum;
+                // setNowPageNum(prevPageNum);
+                // console.log(prevPageNum);
+                setNowPageNum(prevPageNum);
+                // console.log(prevPageLayer);
+                setTransformX(-1080 * (prevPageNum - 1));
+                handlePageLayer(prevPageNum);
+            }
             // console.log('board/search page');
             const searchData = location?.state.searchData;
             searchInputRef.current.value = searchData;
             let fetchItems;
             if (searchData === '') {
-                console.log('value none');
+                // console.log('value none');
                 fetchItems = async () => {
                     try {
                         const fullURL = `http://localhost:8080/boardList`;
                         const response = await axios.get(fullURL);
-                        const result = await response.data;
-                        setBoardList(result);
-                        setIsLoading(false);
+                        const boardList = await response.data;
+                        if (boardList.length === 0) {
+                            setBoardList([]);
+                            setIsLoading(false);
+                        } else {
+                            let boardListFullCopy = [];
+                            let boardListSmallCopy = [];
+                            let count = 1;
+                            let pageNumFullCopy = [];
+                            let pageNumSmallCopy = [];
+
+                            for (let i = 0; i < boardList.length; i++) {
+                                boardListSmallCopy.push(boardList[i]);
+                                // 각 리스트 <= 9개 게시글
+                                if ((i + 1) % 9 === 0) {
+                                    boardListFullCopy.push(boardListSmallCopy);
+                                    boardListSmallCopy = [];
+                                    pageNumSmallCopy.push(count);
+                                    if (count % 3 === 0) {
+                                        pageNumFullCopy.push(pageNumSmallCopy);
+                                        pageNumSmallCopy = [];
+                                    }
+                                    count += 1;
+                                }
+                                // 마지막 리스트 <= 9개 미만의 게시글
+                                if (i === boardList.length - 1) {
+                                    boardListFullCopy.push(boardListSmallCopy);
+                                    pageNumSmallCopy.push(count);
+                                    pageNumFullCopy.push(pageNumSmallCopy);
+                                }
+                            };
+                            // 저장한 모든 리스트를 갖는 전체 리스트
+                            setBoardList(boardListFullCopy);
+                            setPageNumList(pageNumFullCopy);
+                            setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
+                            // setNowPageNum(location?.state.prevPageNum);
+                            setIsLoading(false);
+                        }
                         // console.log(result);
                     } catch (error) {
                         // console.error('Error getting itemType data:', error);
@@ -457,9 +557,44 @@ export default function BoardListBodyContainer({
                     try {
                         const fullURL = `http://localhost:8080/boardList/search/${searchData}`;
                         const response = await axios.get(fullURL);
-                        const result = await response.data;
-                        setBoardList(result);
-                        setIsLoading(false);
+                        const boardList = await response.data;
+                        if (boardList.length === 0) {
+                            setBoardList([]);
+                            setIsLoading(false);
+                        } else {
+                            let boardListFullCopy = [];
+                            let boardListSmallCopy = [];
+                            let count = 1;
+                            let pageNumFullCopy = [];
+                            let pageNumSmallCopy = [];
+
+                            for (let i = 0; i < boardList.length; i++) {
+                                boardListSmallCopy.push(boardList[i]);
+                                // 각 리스트 <= 9개 게시글
+                                if ((i + 1) % 9 === 0) {
+                                    boardListFullCopy.push(boardListSmallCopy);
+                                    boardListSmallCopy = [];
+                                    pageNumSmallCopy.push(count);
+                                    if (count % 3 === 0) {
+                                        pageNumFullCopy.push(pageNumSmallCopy);
+                                        pageNumSmallCopy = [];
+                                    }
+                                    count += 1;
+                                }
+                                // 마지막 리스트 <= 9개 미만의 게시글
+                                if (i === boardList.length - 1) {
+                                    boardListFullCopy.push(boardListSmallCopy);
+                                    pageNumSmallCopy.push(count);
+                                    pageNumFullCopy.push(pageNumSmallCopy);
+                                }
+                            };
+                            // 저장한 모든 리스트를 갖는 전체 리스트
+                            setBoardList(boardListFullCopy);
+                            setPageNumList(pageNumFullCopy);
+                            setLastpageNum(pageNumFullCopy[pageNumFullCopy.length - 1][[pageNumFullCopy.length - 1].length]);
+                            setNowPageNum(location?.state.prevPageNum);
+                            setIsLoading(false);
+                        }
                     } catch (error) {
                         // console.error('Error getting itemType data:', error);
                         throw error;
@@ -482,16 +617,20 @@ export default function BoardListBodyContainer({
         const searchData = searchInputRef.current.value;
         navigate(`/board/search`, { state: { searchData: searchData } });
     };
+    const [clickedBoard, setClickedBoard] = useState({});
     // mouse event area
-    const handleMouseDown = (e) => {
-        setStartX(e.pageX);
-        setDragging(true);
-        setHowMuchDrag(0);
+    const handleMouseDown = (e, board) => {
+        if (board === null) {
+            setStartX(e.pageX);
+            setDragging(true);
+            setHowMuchDrag(0);
+        } else {
+            setClickedBoard(board);
+        }
     };
     const handleMouseMove = (e) => {
         if (!dragging) return;
         const deltaX = (e.pageX - startX);
-        // console.log('deltaX : ' + deltaX);
         setHowMuchDrag((prevHowMuchDrag) => prevHowMuchDrag + deltaX);
         setTransformX((prevTransformX) => prevTransformX + deltaX);
         setStartX(e.pageX);
@@ -500,12 +639,19 @@ export default function BoardListBodyContainer({
         setStartX(null);
         setDragging(false);
         setHowMuchDrag(0);
-        // 하나의 container width 1080
-        if (howMuchDrag === 0) {
-            if ((dragging)) {
-                console.log('just click');
-            }
-        } else if (howMuchDrag >= 150) {
+        if (howMuchDrag === 0 && dragging) {
+            console.log('----------------------------');
+            console.log('just click');
+            // 저장한 클릭된 게시글을 가져온다.
+            // console.log(clickedBoard);
+            const board = clickedBoard;
+            const prevPathname = location.pathname;
+            const searchData = searchInputRef.current.value;
+            const prevPageNum = nowPageNum;
+            // 상세 게시글 페이지로 이동
+            navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData, prevPageNum } });
+
+        } else if (howMuchDrag >= 50) {
             if (nowPageNum > 1) {
                 // console.log('slide to prev container');
                 const initialPageNum = nowPageNum - 1;
@@ -517,7 +663,7 @@ export default function BoardListBodyContainer({
                 setTransformX(0);
                 handlePageLayer(nowPageNum);
             }
-        } else if (howMuchDrag <= -150) {
+        } else if (howMuchDrag <= -50) {
             if (nowPageNum < lastPageNum) {
                 // console.log('slide to next container');
                 const initialPageNum = nowPageNum + 1;
@@ -533,39 +679,36 @@ export default function BoardListBodyContainer({
             // console.log('slide to now container');
             const initialPageNum = nowPageNum;
             setTransformX(-1080 * (initialPageNum - 1));
-            handlePageLayer(initialPageNum - 1);
+            handlePageLayer(initialPageNum);
         }
     };
     // const moveToBoardDetailPage = async (board) => {
     //     const prevPathname = location.pathname;
     //     const searchData = searchInputRef.current.value;
-    //     navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData } });
+    //     console.log(prevPathname);
+    //     console.log(searchData);
+    //     console.log(board);
+    //     // navigate(`/boardDetail/${board._id}`, { state: { board, prevPathname, searchData } });
     // };
     const handleClickPageNum = (pageNum) => {
-        // console.log(pageNum);
         setNowPageNum(pageNum);
         setTransformX(-1080 * (pageNum - 1));
         handlePageLayer(pageNum);
     };
     const handlePageLayer = (pageNum) => {
-        // console.log('set page layer');
-        // console.log('pageNum : ' + pageNum);
         const initialPageLayer = Math.ceil(pageNum / 3);
-        // console.log('initialPageLayer : ' + initialPageLayer);
         setNowPageLayer(initialPageLayer);
     };
     const togglePageMove = (forward) => {
         if (forward === 'prev') {
-            console.log('click prev');
+            // console.log('click prev');
             const initialPageNum = nowPageNum - 1;
-            console.log(initialPageNum);
             setNowPageNum(initialPageNum);
             handlePageLayer(initialPageNum);
             setTransformX(-1080 * (initialPageNum - 1));
         } else {
-            console.log('click next');
+            // console.log('click next');
             const initialPageNum = nowPageNum + 1;
-            console.log(initialPageNum);
             setNowPageNum(initialPageNum);
             handlePageLayer(initialPageNum);
             setTransformX(-1080 * (initialPageNum - 1));
@@ -614,7 +757,7 @@ export default function BoardListBodyContainer({
                                             <BoardListWrapper
                                                 ref={boardListWrapperRef}
                                                 $transformX={transformX}
-                                                onMouseDown={handleMouseDown}
+                                                onMouseDown={(e) => handleMouseDown(e, null)}
                                                 onMouseMove={handleMouseMove}
                                                 onMouseUp={handleMouseUp}
                                                 onMouseLeave={handleMouseUp}
@@ -628,6 +771,7 @@ export default function BoardListBodyContainer({
                                                                 boards.map((board, j) =>
                                                                     <BoardContainer
                                                                         key={j}
+                                                                        onMouseDown={(e) => handleMouseDown(e, board)}
                                                                     >
                                                                         <BoardTypeWrapper>
                                                                             <Text>[ {board.boardTypeName} ]</Text>
@@ -669,7 +813,7 @@ export default function BoardListBodyContainer({
                                         <PageNumListFullContainer>
                                             <PageMoveContainer>
                                                 {
-                                                    nowPageNum === 1 ? null :
+                                                    nowPageNum === 1 || pageNumList.length === 1 ? null :
                                                         <PageMoveImgContainer
                                                             onClick={() => togglePageMove('prev')}
                                                         >
@@ -713,7 +857,7 @@ export default function BoardListBodyContainer({
                                             </PageNumListContainer>
                                             <PageMoveContainer>
                                                 {
-                                                    nowPageNum === lastPageNum ? null :
+                                                    nowPageNum === lastPageNum || pageNumList.length === 1 ? null :
                                                         <PageMoveImgContainer>
                                                             <PageMoveImg
                                                                 src="/image/chevron-right.svg"

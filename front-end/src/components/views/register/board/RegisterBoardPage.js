@@ -273,7 +273,14 @@ export default function RegisterBoardPage() {
         const randomString1 = Math.random().toString(36).substring(2, 14);
         const randomString2 = Math.random().toString(36).substring(2, 14);
         // console.log(boardTypeList);
-        const matchedBoard = boardTypeList.find((element) => element.value === boardTypeRef.current.value);
+        let matchedBoard = boardTypeList.find((element) => element.value === boardTypeRef.current.value);
+        if (matchedBoard === undefined) {
+            const empty = {
+                value: '',
+                name: '',
+            }
+            matchedBoard = empty;
+        }
         const data = {
             boardId: randomString1 + '-' + randomString2,
             boardTypeValue: matchedBoard.value,

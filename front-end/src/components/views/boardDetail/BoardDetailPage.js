@@ -168,6 +168,7 @@ const HeaderText = styled.p`
 `;
 const BoardContentSection = styled.section`
     width: 100%;
+    min-height: 35rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -324,7 +325,11 @@ export default function BoardDetailPage() {
         // 이전 페이지와 검색페이지 일 경우 검색어 기억하기
         const prevPathname = location?.state.prevPathname;
         const searchData = location?.state.searchData;
-        navigate(prevPathname, { state: { searchData } });
+        const prevPageNum = location?.state.prevPageNum;
+        // console.log(prevPathname);
+        // console.log(searchData);
+        // console.log(prevPageNum);
+        navigate(prevPathname, { state: { searchData, prevPageNum } });
     };
     const handleLikeClick = async (board) => {
         // console.log('like btn click');
