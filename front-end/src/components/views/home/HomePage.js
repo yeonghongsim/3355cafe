@@ -634,7 +634,7 @@ export default function HomePage(props) {
                                 </RecentBoardListFullContainer>
                             </BodyContainerRightSmall>
                             <BodyContainerRightSmall>
-                                이미지 파일들(ppt, video) 다운로드
+                                이미지 파일들(ppt, video) 다운로드2
                             </BodyContainerRightSmall>
                         </BodyContainerRight>
                     </BodyContainer>
