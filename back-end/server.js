@@ -14,6 +14,8 @@ const { ObjectId } = require('mongodb');
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
+const PORT = process.env.PORT || 8080;
+
 const MongoClient = require('mongodb').MongoClient;
 MongoClient.connect('mongodb+srv://admin:qwer1234@cluster0.qme18ml.mongodb.net/?retryWrites=true&w=majority',
     function (error, client) {
@@ -24,8 +26,8 @@ MongoClient.connect('mongodb+srv://admin:qwer1234@cluster0.qme18ml.mongodb.net/?
         console.log('success to connecting DB');
 
         // mongodb connect 시 서버 연결 원할 경우
-        app.listen(8080, function () {
-            console.log('listening on 8080')
+        app.listen(PORT, function () {
+            console.log('listening on ' + PORT)
         })
     })
 

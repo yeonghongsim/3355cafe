@@ -304,6 +304,22 @@ const RecentBoardText = styled.p`
         text-decoration: underline;
     }
 `;
+const IconsFullContainer = styled.div`
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: felx-start;
+    justify-content: flex-start;
+    padding: 1rem;
+    box-sizing: border-box;
+`;
+const IconsContainer = styled.div`
+    width: 10rem;
+    height: 50%;
+    border: 1px solid black;
+    box-sizing: border-box;
+`;
 const FooterSection = styled.section`
     width: 100%;
     height: 7vh;
@@ -634,7 +650,12 @@ export default function HomePage(props) {
                                 </RecentBoardListFullContainer>
                             </BodyContainerRightSmall>
                             <BodyContainerRightSmall>
-                                이미지 파일들(ppt, video) 다운로드2
+                                <IconsFullContainer>
+                                    <IconsContainer>1</IconsContainer>
+                                    <IconsContainer>2</IconsContainer>
+                                    <IconsContainer>3</IconsContainer>
+                                    <IconsContainer>4</IconsContainer>
+                                </IconsFullContainer>
                             </BodyContainerRightSmall>
                         </BodyContainerRight>
                     </BodyContainer>
